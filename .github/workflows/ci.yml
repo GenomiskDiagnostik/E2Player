@@ -19,8 +19,3 @@ jobs:
       - run: npm ci
       - run: npm test
       - run: npm run pack
-      - uses: actions/upload-artifact@v7
-        with:
-          name: e2player
-          path: e2player.ehpk
-          if-no-files-found: error

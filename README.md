@@ -32,7 +32,7 @@ npm test
 npm run pack
 ```
 
-The pack command type-checks, builds, and writes `e2player.ehpk` at the repository root. GitHub Actions also uploads the package as a build artifact. The package requests no microphone or external network permissions.
+The pack command type-checks, builds, and writes `e2player.ehpk` at the repository root. GitHub Actions verifies the test and pack commands. The package requests no microphone or external network permissions.
 
 For a physical-device preview, use [Even's QR testing guide](https://hub.evenrealities.com/docs/test/local-testing) with the phone and development machine on the same network. Use `npm exec -- vite --host 0.0.0.0 --strictPort` for this LAN test. For installation of the packaged build, follow the [Even Hub packaging and beta guide](https://hub.evenrealities.com/docs/ship/packaging).
 
