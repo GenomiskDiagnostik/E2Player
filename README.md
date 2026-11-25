@@ -4,6 +4,8 @@ E2Player is an Even Hub plugin project for Even G2 and the R1 ring. The first bu
 
 The project goals also include Wear-style control of the phone's active media session, G2 voice search for YouTube, and synced captions on the glasses for eligible videos. [PLANS.md](PLANS.md) records the platform constraints and the acceptance checks.
 
+The separate [Android caption probe](android/README.md) tests local OCR of player-rendered captions from a user-shared app window. Its current output is available in a diagnostic view on the phone.
+
 ## Run locally
 
 Requires Node.js 24 and npm. The first package targets Even Realities App 2.2.10 or later.

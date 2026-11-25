@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">E2Player Caption Probe</string>
+    <string name="title">Caption Probe</string>
+    <string name="instructions">Share a single player app. Turn on its captions and hide its controls. Use split screen to see the probe alongside the source.</string>
+    <string name="choose_source">Choose app to share</string>
+    <string name="stop_sharing">Stop sharing</string>
+    <string name="no_current_text">No current text</string>
+    <string name="sharing_off">Sharing is off</string>
+    <string name="starting">Starting screen sharing</string>
+    <string name="declined">Android declined the screen sharing request</string>
+    <string name="start_failed">Could not start capture or load offline OCR</string>
+    <string name="resizing">Waiting for the resized app</string>
+    <string name="resize_failed">Android could not resize the shared app</string>
+    <string name="reading">Reading caption area</string>
+    <string name="hidden">Shared app is hidden</string>
+    <string name="unreadable">Waiting for a readable frame</string>
+    <string name="notification_channel">Caption capture</string>
+    <string name="notification_description">Reading the shared screen area locally</string>
+</resources>

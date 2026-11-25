@@ -1,0 +1,88 @@
+import java.security.MessageDigest
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
+
+plugins {
+    id 'com.android.application' version '8.13.2'
+}
+
+android {
+    namespace 'com.genomiskdiagnostik.e2player.captionprobe'
+    compileSdk 36
+
+    defaultConfig {
+        applicationId 'com.genomiskdiagnostik.e2player.captionprobe'
+        minSdk 34
+        targetSdk 36
+        versionCode 1
+        versionName '0.1.0'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    implementation 'cz.adaptech.tesseract4android:tesseract4android:4.9.0'
+    testImplementation 'junit:junit:4.13.2'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+// Fetch language models at build time. The installed app never downloads them.
+abstract class PrepareTessdata extends DefaultTask {
+    @Input abstract Property<String> getRevision()
+    @Input abstract MapProperty<String, String> getChecksums()
+    @OutputDirectory abstract DirectoryProperty getOutputDir()
+
+    @TaskAction
+    void prepare() {
+        def directory = outputDir.dir('tessdata').get().asFile
+        directory.mkdirs()
+        for (entry in checksums.get().entrySet()) {
+            def language = entry.key
+            def expected = entry.value
+            def name = "${language}.traineddata"
+            def model = new File(directory, name)
+            if (!model.isFile() || sha256(model) != expected) {
+                def temporary = Files.createTempFile(directory.toPath(), language, '.tmp')
+                try {
+                    def source = "https://raw.githubusercontent.com/tesseract-ocr/tessdata_fast/${revision.get()}/${name}"
+                    def connection = URI.create(source).toURL().openConnection()
+                    connection.connectTimeout = 15000
+                    connection.readTimeout = 30000
+                    connection.inputStream.withCloseable { stream ->
+                        Files.copy(stream, temporary, StandardCopyOption.REPLACE_EXISTING)
+                    }
+                    if (sha256(temporary.toFile()) != expected) {
+                        throw new GradleException("Unexpected checksum for ${name}")
+                    }
+                    Files.move(temporary, model.toPath(), StandardCopyOption.REPLACE_EXISTING)
+                } finally {
+                    Files.deleteIfExists(temporary)
+                }
+            }
+        }
+    }
+
+    private static String sha256(File file) {
+        MessageDigest.getInstance('SHA-256').digest(file.bytes).encodeHex().toString()
+    }
+}
+
+def prepareTessdata = tasks.register('prepareTessdata', PrepareTessdata) {
+    revision.set('65727574dfcd264acbb0c3e07860e4e9e9b22185')
+    checksums.set([
+        dan: 'acb1fd074487a31d1294fcdfd7d7c673467ffd8aeacb2ccd61ebcbf04eb4e2fa',
+        eng: '7d4322bd2a7749724879683fc3912cb542f19906c83bcc1a52132556427170b2'
+    ])
+    outputDir.set(layout.buildDirectory.dir('generated/tessdataAssets'))
+}
+
+androidComponents.onVariants(androidComponents.selector().all()) { variant ->
+    variant.sources.assets.addGeneratedSourceDirectory(prepareTessdata) { it.outputDir }
+}
