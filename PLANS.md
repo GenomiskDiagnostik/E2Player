@@ -24,7 +24,9 @@ Sources: [YouTube IFrame Player API](https://developers.google.com/youtube/ifram
 
 ## 3. YouTube captions on G2
 
-- [ ] Pilot an editable test video with an authorized, timed caption track. Pair the track with its video ID and synchronize cues to the player's clock. Verify the on/off action, seeking, pauses, track switches and unavailable subtitles.
-- [ ] Confirm permitted caption sources before expanding beyond the pilot. The documented IFrame API does not expose timed caption text. YouTube Data API caption download requires permission to edit the video. Evaluate separately supplied tracks with appropriate rights and display a clear unavailable state for unsupported videos.
+- [x] Build an offline Android probe for visible captions via single-app capture and OCR. See [decision record](docs/adr/0001-read-rendered-captions.md) and [probe setup](android/README.md).
+- [ ] Validate the local probe on an Android phone with synthetic captions. Check capture consent, crop, timing, pause, seek, rotation, track changes, protected frames and clearing when the source is hidden or capture stops. Measure recognition accuracy and latency before adding scripts or an adjustable crop.
+- [ ] Confirm permitted YouTube use and test the selected player captions on a representative set of videos. Check subtitles off, absent tracks, auto captions and selected languages. Use the visible cue for synchronization and validate the playback-position source separately.
+- [ ] Verify how text-only observations can reach the packaged Even Hub plugin without external services. Confirm G2 display, R1 toggle, and expiry on paired hardware while the player is visible.
 
-Sources: [YouTube IFrame Player API](https://developers.google.com/youtube/iframe_api_reference), [YouTube Captions download](https://developers.google.com/youtube/v3/docs/captions/download).
+Sources: [YouTube IFrame Player API](https://developers.google.com/youtube/iframe_api_reference), [YouTube Captions download](https://developers.google.com/youtube/v3/docs/captions/download), [Android MediaProjection](https://developer.android.com/media/grow/media-projection).
