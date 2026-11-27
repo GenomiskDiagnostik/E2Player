@@ -27,12 +27,18 @@ Use Android 14 QPR2 or newer with single-app sharing. Start with owned or synthe
 
 1. Install the debug APK and open **E2Player Caption Probe** beside the player in split screen.
 2. Select **Choose app to share** and select the player under single-app sharing. Turn captions on in the player and dismiss its controls.
-3. Watch the detected text during playback, pause, seeking and cue changes. The probe looks for white text in the central 80% of the window width and 58–96% of its height. Use the default white caption color and a dark caption background where available. Empty reads and observations older than two seconds clear the text.
+3. Watch the detected text during playback, pause, seeking and cue changes. Use white captions with a dark background where available. Empty reads and observations older than two seconds clear the text. [Adjust the OCR area](#adjust-the-ocr-area)
 4. Hide the player, rotate the phone and stop sharing. Confirm that the old caption clears and that starting again requires the system's consent.
 
 To test the Even Hub link, pair once using the companion's code on the same phone. Stop and restart sharing, and reopen the plugin to confirm it reconnects with the saved code. Exercise **Subtitles only** and verify that stopping sharing clears the text in either layout. With the media-controls variant, enable notification access from **Media control access** before testing commands against the active player. Some players offer only a subset of the transport actions.
 
 The app picker can also offer full-screen sharing. Select a single app to keep other windows outside the capture. Android can withhold protected frames. Visible text inside the crop can be mistaken for a caption, and OCR can miss words and punctuation.
+
+## Adjust the OCR area
+
+Open **OCR area** in the Android companion to exclude unwanted text above the subtitles. Move the slider to select how much of the shared window's height to skip from the top. Selecting 70% scans the bottom 30% from the cutoff to the bottom edge. The saved cutoff applies from the next sampled frame, including when you adjust it during screen sharing.
+
+OCR uses the central 80% of the window width. Choose **Standard** to use the original vertical area between 58% and 96% of the window height.
 
 ## Subtitle history and export
 

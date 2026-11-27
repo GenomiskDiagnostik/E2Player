@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ocr_crop_title">OCR-Bereich</string>
+    <string name="ocr_crop_button">OCR-Bereich (%1$s)</string>
+    <string name="ocr_crop_standard">Standard</string>
+    <string name="ocr_crop_summary">Obere %1$d %% ausgeblendet</string>
+    <string name="ocr_crop_selection">Überspringe die oberen %1$d %% und lies die unteren %2$d %%.</string>
+</resources>

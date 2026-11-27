@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ocr_crop_title">Zona de OCR</string>
+    <string name="ocr_crop_button">Zona de OCR (%1$s)</string>
+    <string name="ocr_crop_standard">Estándar</string>
+    <string name="ocr_crop_summary">%1$d %% superior excluido</string>
+    <string name="ocr_crop_selection">Omite el %1$d %% superior y analiza el %2$d %% inferior.</string>
+</resources>

@@ -6,7 +6,9 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ServiceInfo;
 import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
@@ -40,6 +42,7 @@ public final class CaptureService extends Service {
     private static final String CHANNEL = "caption_capture";
     private static final int NOTIFICATION_ID = 1;
     private static final long SAMPLE_INTERVAL_MS = 250;
+    private static final String IGNORED_TOP_PERCENT = "ignored-top-percent";
 
     record State(boolean running, int status, CaptionSample sample) {}
     private static final State INACTIVE = new State(false, R.string.sharing_off, null);
@@ -67,6 +70,18 @@ public final class CaptureService extends Service {
 
     static boolean historyFailed() {
         return historyFailed;
+    }
+
+    static int ignoredTopPercent(Context context) {
+        return ocrPreferences(context).getInt(IGNORED_TOP_PERCENT, CaptionRaster.STANDARD_CROP);
+    }
+
+    static void setIgnoredTopPercent(Context context, int percent) {
+        ocrPreferences(context).edit().putInt(IGNORED_TOP_PERCENT, percent).apply();
+    }
+
+    private static SharedPreferences ocrPreferences(Context context) {
+        return context.getSharedPreferences("e2player-ocr", MODE_PRIVATE);
     }
 
     private HandlerThread captureThread;
@@ -259,7 +274,7 @@ public final class CaptureService extends Service {
             try (var frame = source.acquireLatestImage()) {
                 if (frame == null || !visible || recognizer == null || now - lastSampleMs < SAMPLE_INTERVAL_MS) return;
                 lastSampleMs = now;
-                crop = captionArea(frame);
+                crop = captionArea(frame, ignoredTopPercent(this));
             }
             recognizer.setImage(crop);
             var sample = new CaptionSample(recognizer.getUTF8Text(), now);
@@ -286,10 +301,11 @@ public final class CaptureService extends Service {
         }
     }
 
-    private static Bitmap captionArea(Image image) {
+    private static Bitmap captionArea(Image image, int ignoredTopPercent) {
         var plane = image.getPlanes()[0];
         if (plane.getPixelStride() != 4) throw new IllegalArgumentException("Expected RGBA pixels");
-        var raster = CaptionRaster.fromRgba(plane.getBuffer(), plane.getRowStride(), image.getWidth(), image.getHeight());
+        var raster = CaptionRaster.fromRgba(plane.getBuffer(), plane.getRowStride(), image.getWidth(),
+                image.getHeight(), ignoredTopPercent);
         return Bitmap.createBitmap(raster.pixels(), raster.width(), raster.height(), Bitmap.Config.ARGB_8888);
     }
 
