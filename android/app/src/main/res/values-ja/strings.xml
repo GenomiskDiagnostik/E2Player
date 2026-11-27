@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">E2Player 字幕</string>
+    <string name="title">字幕認識</string>
+    <string name="instructions">プレーヤーアプリだけを共有してください。字幕をオンにして操作ボタンを隠します。画面分割を使うと、共有元と認識結果を並べて表示できます。</string>
+    <string name="choose_source">共有するアプリを選択</string>
+    <string name="stop_sharing">共有を停止</string>
+    <string name="no_current_text">表示中のテキストなし</string>
+    <string name="sharing_off">共有はオフです</string>
+    <string name="starting">画面共有を開始しています</string>
+    <string name="declined">Android が画面共有を拒否しました</string>
+    <string name="start_failed">画面共有またはオフライン文字認識を開始できませんでした</string>
+    <string name="resizing">変更後のアプリサイズを待っています</string>
+    <string name="resize_failed">Android が共有アプリのサイズを変更できませんでした</string>
+    <string name="reading">字幕領域を読み取っています</string>
+    <string name="hidden">共有アプリは非表示です</string>
+    <string name="unreadable">読み取り可能な画像を待っています</string>
+    <string name="notification_channel">字幕認識</string>
+    <string name="notification_description">共有領域を端末内で読み取っています</string>
+    <string name="language">言語</string>
+    <string name="system_language">システムの言語</string>
+    <string name="copy_glasses_code">グラス用コードをコピー</string>
+    <string name="code_copied">コードをコピーしました。Even Hub の E2Player に貼り付けてください。</string>
+    <string name="link_unavailable">ローカル接続を開始できませんでした。共有を停止してもう一度お試しください。</string>
+    <string name="media_access_help">再生を操作するには E2Player の通知アクセスを許可してください。この権限は現在のプレーヤーの検出に使います。</string>
+    <string name="media_access_settings">メディア操作へのアクセス</string>
+</resources>

@@ -1,25 +1,42 @@
 package com.genomiskdiagnostik.e2player.captionprobe;
 
 import android.app.Activity;
+import android.app.LocaleManager;
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.content.ClipboardManager;
 import android.content.Intent;
 import android.media.projection.MediaProjectionConfig;
 import android.media.projection.MediaProjectionManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.LocaleList;
+import android.os.PersistableBundle;
 import android.os.SystemClock;
+import android.provider.Settings;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.util.Arrays;
 
 public final class ProbeActivity extends Activity {
     private static final int CAPTURE_REQUEST = 1;
+    private static final String[] LOCALE_TAGS = {"", "en", "ja", "da", "de", "fr", "es", "zh-Hans"};
     private final Handler ui = new Handler(Looper.getMainLooper());
     private Button start;
     private Button stop;
+    private Button copy;
     private TextView status;
+    private TextView linkStatus;
     private TextView caption;
     private boolean choosingSource;
 
@@ -29,6 +46,8 @@ public final class ProbeActivity extends Activity {
             var state = CaptureService.state();
             start.setEnabled(!state.running() && !choosingSource);
             stop.setEnabled(state.running());
+            copy.setEnabled(CaptureService.pairingCode() != null);
+            linkStatus.setVisibility(CaptureService.linkFailed() ? View.VISIBLE : View.GONE);
             status.setText(state.status());
             String text = state.sample() == null ? "" : state.sample().visibleText(SystemClock.elapsedRealtime());
             caption.setText(text.isEmpty() ? getText(R.string.no_current_text) : text);
@@ -59,6 +78,7 @@ public final class ProbeActivity extends Activity {
         title.setText(R.string.title);
         title.setTextSize(24);
         content.addView(title);
+        addLanguagePicker(content);
 
         var instructions = new TextView(this);
         instructions.setText(R.string.instructions);
@@ -80,11 +100,69 @@ public final class ProbeActivity extends Activity {
         stop.setOnClickListener(view -> stopService(new Intent(this, CaptureService.class)));
         content.addView(stop);
 
+        copy = new Button(this);
+        copy.setText(R.string.copy_glasses_code);
+        copy.setOnClickListener(view -> copyPairingCode());
+        content.addView(copy);
+
+        linkStatus = new TextView(this);
+        linkStatus.setText(R.string.link_unavailable);
+        content.addView(linkStatus);
+
         status = new TextView(this);
         content.addView(status);
         caption = new TextView(this);
         caption.setTextSize(20);
         content.addView(caption);
+
+        var mediaHelp = new TextView(this);
+        mediaHelp.setText(R.string.media_access_help);
+        content.addView(mediaHelp);
+        var mediaSettings = new Button(this);
+        mediaSettings.setText(R.string.media_access_settings);
+        mediaSettings.setOnClickListener(view -> startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)));
+        content.addView(mediaSettings);
+    }
+
+    private void addLanguagePicker(LinearLayout content) {
+        var label = new TextView(this);
+        label.setText(R.string.language);
+        var picker = new Spinner(this);
+        picker.setId(View.generateViewId());
+        label.setLabelFor(picker.getId());
+        var choices = new String[]{getString(R.string.system_language), "English", "日本語", "Dansk",
+                "Deutsch", "Français", "Español", "简体中文"};
+        var adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, choices);
+        picker.setAdapter(adapter);
+        var manager = getSystemService(LocaleManager.class);
+        int selected = Arrays.asList(LOCALE_TAGS).indexOf(manager.getApplicationLocales().toLanguageTags());
+        picker.setSelection(Math.max(0, selected));
+        picker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int index, long id) {
+                String tag = LOCALE_TAGS[index];
+                if (!tag.equals(manager.getApplicationLocales().toLanguageTags())) {
+                    manager.setApplicationLocales(LocaleList.forLanguageTags(tag));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+        content.addView(label);
+        content.addView(picker);
+    }
+
+    private void copyPairingCode() {
+        String code = CaptureService.pairingCode();
+        if (code == null) return;
+        var clipboard = getSystemService(ClipboardManager.class);
+        var clip = ClipData.newPlainText(getText(R.string.copy_glasses_code), code);
+        var extras = new PersistableBundle();
+        extras.putBoolean(ClipDescription.EXTRA_IS_SENSITIVE, true);
+        clip.getDescription().setExtras(extras);
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(this, R.string.code_copied, Toast.LENGTH_SHORT).show();
     }
 
     @Override

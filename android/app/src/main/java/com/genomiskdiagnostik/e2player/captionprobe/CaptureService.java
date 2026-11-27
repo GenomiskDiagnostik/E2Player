@@ -23,6 +23,8 @@ import android.os.SystemClock;
 import android.view.WindowManager;
 
 import com.googlecode.tesseract.android.TessBaseAPI;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,15 +41,26 @@ public final class CaptureService extends Service {
     record State(boolean running, int status, CaptionSample sample) {}
     private static final State INACTIVE = new State(false, R.string.sharing_off, null);
     private static volatile State currentState = INACTIVE;
+    private static volatile String pairingCode;
+    private static volatile boolean linkFailed;
 
     static State state() {
         return currentState;
+    }
+
+    static String pairingCode() {
+        return pairingCode;
+    }
+
+    static boolean linkFailed() {
+        return linkFailed;
     }
 
     private HandlerThread captureThread;
     private Handler capture;
     private volatile boolean closing;
     private boolean started;
+    private CaptionBridge bridge;
 
     // These resources are used only on the capture thread.
     private ImageReader reader;
@@ -108,6 +121,7 @@ public final class CaptureService extends Service {
         try {
             startForeground(NOTIFICATION_ID, notification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION);
             started = true;
+            linkFailed = false;
             update(true, R.string.starting, null);
             captureThread = new HandlerThread("caption-capture");
             captureThread.start();
@@ -133,9 +147,37 @@ public final class CaptureService extends Service {
                     density(), DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, reader.getSurface(), null, capture);
             if (display == null) throw new IOException("Could not create the virtual display");
             recognizer = openRecognizer();
+            openBridge();
         } catch (RuntimeException | IOException | UnsatisfiedLinkError ignored) {
             update(false, R.string.start_failed, null);
             stopSelf();
+        }
+    }
+
+    private synchronized void openBridge() {
+        if (closing) return;
+        var media = new PhoneMedia(this);
+        try {
+            bridge = new CaptionBridge(CaptionBridge.PORT, () -> bridgeSnapshot(media),
+                    (id, action) -> !closing && media.send(id, action));
+            pairingCode = bridge.code();
+        } catch (IOException ignored) {
+            linkFailed = true;
+        }
+    }
+
+    private String bridgeSnapshot(PhoneMedia media) {
+        var state = currentState;
+        var sample = closing ? null : state.sample();
+        String text = sample == null ? "" : sample.visibleText(SystemClock.elapsedRealtime());
+        try {
+            var playing = media.snapshot();
+            return new JSONObject().put("caption", PhoneMedia.limit(text, 160))
+                    .put("mediaAccess", media.hasAccess())
+                    .put("media", playing == null ? JSONObject.NULL : playing)
+                    .toString();
+        } catch (JSONException ignored) {
+            return "{\"caption\":\"\",\"mediaAccess\":false,\"media\":null}";
         }
     }
 
@@ -219,6 +261,15 @@ public final class CaptureService extends Service {
     public void onDestroy() {
         synchronized (this) {
             closing = true;
+            pairingCode = null;
+            linkFailed = false;
+            if (bridge != null) {
+                try {
+                    bridge.close();
+                } catch (IOException ignored) {
+                    // The session is invalidated even if the socket was already closed.
+                }
+            }
             if (currentState.running()) currentState = INACTIVE;
         }
         if (capture != null) {

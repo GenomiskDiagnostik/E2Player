@@ -91,7 +91,7 @@ test('normal end clears captions and rejected play offers a phone fallback', asy
   media.play = async () => { throw new DOMException('Blocked', 'NotAllowedError') }
   player.run('togglePlayback')
   await Promise.resolve()
-  assert.match(player.snapshot.error, /Tap Play on the phone/)
+  assert.equal(player.snapshot.error, 'playBlocked')
 })
 
 test('stop cancels an in-flight start and suppresses its later rejection', async () => {

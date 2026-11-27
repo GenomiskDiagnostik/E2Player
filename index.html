@@ -10,12 +10,36 @@
     <main>
       <header>
         <h1>E2Player</h1>
-        <p id="device" role="status">Phone preview</p>
+        <label class="language">
+          <span data-text="language">Language</span>
+          <select id="language"><option value="system" data-text="systemLanguage">System language</option></select>
+        </label>
       </header>
-      <section aria-labelledby="title">
+      <p id="device" role="status"></p>
+      <div id="sources" class="sources" role="group">
+        <button id="android-source" type="button" data-text="android"></button>
+        <button id="demo-source" type="button" data-text="demo"></button>
+      </div>
+      <section id="android-panel" aria-labelledby="android-title">
+        <h2 id="android-title"></h2>
+        <p id="link-status" role="status"></p>
+        <p id="link-help" class="hint" data-text="pairHelp"></p>
+        <form id="pairing">
+          <label for="pairing-code" data-text="pairingCode"></label>
+          <div class="pairing-input">
+            <input id="pairing-code" type="password" required maxlength="22" autocomplete="off"
+              autocapitalize="off" spellcheck="false">
+            <button type="submit" data-text="connect"></button>
+          </div>
+        </form>
+        <p id="pairing-error" role="alert" hidden></p>
+        <button id="disconnect" type="button" data-text="disconnect" hidden></button>
+        <p id="media-help" class="hint" hidden></p>
+      </section>
+      <section id="demo-panel" aria-labelledby="title" hidden>
         <div id="stage" class="stage">
-          <video id="media" playsinline preload="metadata" aria-label="Test video"></video>
-          <span id="audio-label" hidden>Audio test</span>
+          <video id="media" playsinline preload="metadata"></video>
+          <span id="audio-label" data-text="audioTest" hidden></span>
         </div>
         <div class="details">
           <div>
@@ -24,11 +48,11 @@
           </div>
           <span id="time"></span>
         </div>
-        <input id="seek" type="range" aria-label="Playback position" min="0" max="0" step="0.1" value="0">
-        <div id="controls" class="controls" aria-label="Playback controls" role="group"></div>
-        <p id="caption" class="caption" hidden></p>
+        <input id="seek" type="range" min="0" max="0" step="0.1" value="0">
       </section>
-      <p class="hint">On G2 or R1, swipe to choose an action and tap to select it.</p>
+      <p id="caption" class="caption" hidden></p>
+      <p class="hint" data-text="ringHint"></p>
+      <div id="controls" class="controls transport" role="group"></div>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

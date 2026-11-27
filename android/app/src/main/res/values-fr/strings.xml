@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">E2Player Sous-titres</string>
+    <string name="title">Reconnaissance des sous-titres</string>
+    <string name="instructions">Partagez uniquement l’application de lecture. Activez ses sous-titres et masquez ses commandes. Utilisez l’écran partagé pour voir le résultat à côté de la source.</string>
+    <string name="choose_source">Choisir l’application à partager</string>
+    <string name="stop_sharing">Arrêter le partage</string>
+    <string name="no_current_text">Aucun texte en cours</string>
+    <string name="sharing_off">Partage désactivé</string>
+    <string name="starting">Démarrage du partage d’écran</string>
+    <string name="declined">Android a refusé le partage d’écran</string>
+    <string name="start_failed">Impossible de démarrer le partage ou de charger la reconnaissance hors connexion</string>
+    <string name="resizing">En attente de la nouvelle taille de l’application</string>
+    <string name="resize_failed">Android n’a pas pu redimensionner l’application partagée</string>
+    <string name="reading">Lecture de la zone des sous-titres</string>
+    <string name="hidden">L’application partagée est masquée</string>
+    <string name="unreadable">En attente d’une image lisible</string>
+    <string name="notification_channel">Reconnaissance des sous-titres</string>
+    <string name="notification_description">Lecture locale de la zone partagée</string>
+    <string name="language">Langue</string>
+    <string name="system_language">Langue du système</string>
+    <string name="copy_glasses_code">Copier le code des lunettes</string>
+    <string name="code_copied">Code copié. Collez-le dans E2Player dans Even Hub.</string>
+    <string name="link_unavailable">La liaison locale n’a pas démarré. Arrêtez le partage et réessayez.</string>
+    <string name="media_access_help">Pour contrôler la lecture, autorisez E2Player à accéder aux notifications. Cet accès sert à trouver le lecteur actif.</string>
+    <string name="media_access_settings">Accès aux commandes multimédias</string>
+</resources>

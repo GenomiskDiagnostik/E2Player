@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">E2Player Undertekster</string>
+    <string name="title">Undertekstlæser</string>
+    <string name="instructions">Del kun afspillerens app. Slå undertekster til, og skjul afspillerens knapper. Brug delt skærm for at se læseren sammen med kilden.</string>
+    <string name="choose_source">Vælg app til deling</string>
+    <string name="stop_sharing">Stop deling</string>
+    <string name="no_current_text">Ingen aktuel tekst</string>
+    <string name="sharing_off">Deling er slået fra</string>
+    <string name="starting">Starter skærmdeling</string>
+    <string name="declined">Android afviste skærmdelingen</string>
+    <string name="start_failed">Kunne ikke starte deling eller indlæse tekstgenkendelse</string>
+    <string name="resizing">Venter på appens nye størrelse</string>
+    <string name="resize_failed">Android kunne ikke ændre størrelsen på den delte app</string>
+    <string name="reading">Læser undertekstområdet</string>
+    <string name="hidden">Den delte app er skjult</string>
+    <string name="unreadable">Venter på et læsbart billede</string>
+    <string name="notification_channel">Undertekstlæsning</string>
+    <string name="notification_description">Læser det delte område lokalt</string>
+    <string name="language">Sprog</string>
+    <string name="system_language">Systemsprog</string>
+    <string name="copy_glasses_code">Kopiér brillekode</string>
+    <string name="code_copied">Kode kopieret. Indsæt den i E2Player i Even Hub.</string>
+    <string name="link_unavailable">Den lokale forbindelse kunne ikke startes. Stop delingen, og prøv igen.</string>
+    <string name="media_access_help">Slå notifikationsadgang til for E2Player for at bruge afspilningsknapperne. E2Player bruger adgangen til at finde den aktive afspiller.</string>
+    <string name="media_access_settings">Adgang til mediestyring</string>
+</resources>

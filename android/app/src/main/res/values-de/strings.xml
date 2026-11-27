@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">E2Player Untertitel</string>
+    <string name="title">Untertitelerkennung</string>
+    <string name="instructions">Gib nur die Player-App frei. Aktiviere ihre Untertitel und blende die Steuerelemente aus. Nutze den geteilten Bildschirm, um die Quelle neben der Erkennung zu sehen.</string>
+    <string name="choose_source">App zur Freigabe auswählen</string>
+    <string name="stop_sharing">Freigabe beenden</string>
+    <string name="no_current_text">Kein aktueller Text</string>
+    <string name="sharing_off">Freigabe ist aus</string>
+    <string name="starting">Bildschirmfreigabe wird gestartet</string>
+    <string name="declined">Android hat die Bildschirmfreigabe abgelehnt</string>
+    <string name="start_failed">Freigabe oder Offline-Texterkennung konnte nicht gestartet werden</string>
+    <string name="resizing">Warten auf die neue App-Größe</string>
+    <string name="resize_failed">Android konnte die Größe der freigegebenen App nicht ändern</string>
+    <string name="reading">Untertitelbereich wird gelesen</string>
+    <string name="hidden">Die freigegebene App ist ausgeblendet</string>
+    <string name="unreadable">Warten auf ein lesbares Bild</string>
+    <string name="notification_channel">Untertitelerkennung</string>
+    <string name="notification_description">Der freigegebene Bereich wird lokal gelesen</string>
+    <string name="language">Sprache</string>
+    <string name="system_language">Systemsprache</string>
+    <string name="copy_glasses_code">Brillencode kopieren</string>
+    <string name="code_copied">Code kopiert. Füge ihn in E2Player in Even Hub ein.</string>
+    <string name="link_unavailable">Die lokale Verbindung konnte nicht gestartet werden. Beende die Freigabe und versuche es erneut.</string>
+    <string name="media_access_help">Erlaube E2Player den Benachrichtigungszugriff für die Wiedergabesteuerung. E2Player verwendet ihn, um den aktiven Player zu finden.</string>
+    <string name="media_access_settings">Zugriff auf Mediensteuerung</string>
+</resources>
