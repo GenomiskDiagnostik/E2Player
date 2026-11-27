@@ -33,7 +33,7 @@ let commandFailed = false
 let refreshGlasses: (() => void) | undefined
 const link = new CaptionLink(() => {
   if (source === 'android') render()
-})
+}, fetch, globalThis.WebSocket)
 
 const transport = ['previous', 'play', 'stop', 'next', 'captions'] as const
 type TransportIcon = typeof transport[number] | 'pause'

@@ -14,8 +14,8 @@ android {
         applicationId 'com.genomiskdiagnostik.e2player.captionprobe'
         minSdk 34
         targetSdk 36
-        versionCode 3
-        versionName '0.2.1'
+        versionCode 4
+        versionName '0.2.2'
     }
 
     buildFeatures {
@@ -42,6 +42,7 @@ android {
 
 dependencies {
     implementation 'cz.adaptech.tesseract4android:tesseract4android:4.9.0'
+    implementation 'org.java-websocket:Java-WebSocket:1.6.0'
     testImplementation 'junit:junit:4.13.2'
 }
 

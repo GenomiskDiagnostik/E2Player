@@ -1,6 +1,6 @@
 # Android caption probe
 
-The companion reads the caption area of a user-shared Android app window using Tesseract with bundled Danish and English models. Frames stay in memory. The app uses Android's socket permission to serve the latest caption on IPv4 loopback. It opens no listener on Wi-Fi or mobile interfaces and sends no data to remote services. [Even Hub pairing instructions](../README.md#connect-on-android).
+The companion reads the caption area of a user-shared Android app window using Tesseract with bundled Danish and English models. Frames stay in memory. The app serves the latest caption on IPv4 loopback over WebSocket on port `47842` and HTTP on port `47841`. It opens no listener on Wi-Fi or mobile interfaces and sends no data to remote services. [Even Hub pairing instructions](../README.md#connect-on-android).
 
 ## Build locally
 
