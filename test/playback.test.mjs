@@ -37,7 +37,6 @@ class TestMedia extends EventTarget {
 
 test('play, pause and stop keep the caption aligned to the playback position', async () => {
   const player = new Playback(new TestMedia(), tracks)
-  player.run('toggleCaptions')
   assert.equal(player.snapshot.caption, '')
 
   player.run('togglePlayback')
@@ -50,10 +49,9 @@ test('play, pause and stop keep the caption aligned to the playback position', a
   assert.equal(player.snapshot.status, 'Paused')
   assert.equal(player.snapshot.caption, 'Second')
 
-  player.run('toggleCaptions')
-  assert.equal(player.snapshot.caption, '')
   player.run('stop')
   assert.equal(player.snapshot.status, 'Stopped')
+  assert.equal(player.snapshot.caption, '')
   assert.equal(player.snapshot.time, 0)
 })
 
@@ -69,7 +67,6 @@ test('previous and next wrap and preserve the current transport state', async ()
   player.run('togglePlayback')
   await Promise.resolve()
   player.seek(7)
-  player.run('toggleCaptions')
   player.run('next')
   await Promise.resolve()
   assert.equal(player.snapshot.status, 'Playing')
@@ -80,7 +77,6 @@ test('previous and next wrap and preserve the current transport state', async ()
 test('normal end clears captions and rejected play offers a phone fallback', async () => {
   const media = new TestMedia()
   const player = new Playback(media, tracks)
-  player.run('toggleCaptions')
   player.run('togglePlayback')
   await Promise.resolve()
   media.ended = true

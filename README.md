@@ -6,9 +6,11 @@ The project goals also include Wear-style control of the phone's active media se
 
 ## Connect on Android
 
-Install the [captions APK](android/README.md#build-locally) and E2Player `.ehpk` version 0.2.2 or later to use the WebSocket link. Start single-app sharing in the companion, select the player and turn on captions in that player. Return to the companion, tap **Copy glasses code**, then paste it into the **Android** view in E2Player in the Even app and tap **Connect**. Return to the player. Use split screen with the Even app if Android suspends the plugin while the player is in front.
+Install version 0.2.3 or later of both the [captions APK](android/README.md#build-locally) and E2Player `.ehpk` for persistent pairing. Start single-app sharing in the companion, select the player and turn on captions in that player. For the first pairing, return to the companion, tap **Copy glasses code**, paste it into the **Android** view in E2Player in the Even app and tap **Connect**. Use split screen with the Even app if Android suspends the plugin while the player is in front.
 
-Swipe on G2 or R1 to select a bottom control, then tap it. The Android view shows captions by default. System playback controls are available with the separate media-controls APK and its Android notification-access grant. Individual controls enable when the active session reports a matching action. Stopping Android screen sharing ends the connection and invalidates its code.
+Swipe on G2 or R1 to select a bottom control, then tap it. **Subtitles only** moves captions to the bottom and hides the title, status and buttons. Tap once in that view to show the controls again. Captions appear in both layouts. The G2 shows playback buttons supported by the active session when using the media-controls APK with Android notification access.
+
+The Even Hub plugin remembers a verified code. When screen sharing stops, the captions clear and E2Player reconnects when you start sharing again. Select **Forget pairing** in the Even phone view to remove the remembered code. Reinstalling the Android companion or clearing its data requires a new pairing.
 
 Both apps follow the system language by default and provide a **Language** selector for English, Japanese, Danish, German, French, Spanish and Simplified Chinese. This changes the interface language. OCR still uses Danish and English models and shows the words recognized from the selected player. The Even Hub CLI does not accept Danish in the app listing metadata, so Danish is selectable inside E2Player.
 

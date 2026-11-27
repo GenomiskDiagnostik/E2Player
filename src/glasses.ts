@@ -6,13 +6,12 @@ import {
   StartUpPageCreateResult,
   TextContainerProperty,
   TextContainerUpgrade,
-  waitForEvenAppBridge,
+  type EvenAppBridge,
 } from '@evenrealities/even_hub_sdk'
 import { wrapIndex } from './playback.ts'
 
 export interface GlassesControl {
   label: string
-  symbol: string
   enabled: boolean
   run(): void
 }
@@ -21,13 +20,15 @@ export interface GlassesScreen {
   source: 'android' | 'demo'
   heading: string
   caption: string
+  subtitlesOnly: boolean
+  showControls(): void
   controls: readonly GlassesControl[]
 }
 
 const containers = [
   { containerID: 1, containerName: 'playing', yPosition: 12, height: 62, isEventCapture: 0 },
-  { containerID: 2, containerName: 'controls', yPosition: 218, height: 66, isEventCapture: 1 },
-  { containerID: 3, containerName: 'caption', yPosition: 81, height: 131, isEventCapture: 0 },
+  { containerID: 2, containerName: 'controls', yPosition: 208, height: 78, isEventCapture: 1 },
+  { containerID: 3, containerName: 'caption', yPosition: 81, height: 122, isEventCapture: 0 },
 ]
 const inputContainer = containers[1]
 const touchSources = [
@@ -36,8 +37,7 @@ const touchSources = [
   EventSourceType.TOUCH_EVENT_FROM_RING,
 ]
 
-export async function connectGlasses(read: () => GlassesScreen): Promise<() => void> {
-  const bridge = await waitForEvenAppBridge()
+export async function connectGlasses(bridge: EvenAppBridge, read: () => GlassesScreen): Promise<() => void> {
   let selected = -1
   let source: GlassesScreen['source'] | undefined
 
@@ -49,14 +49,15 @@ export async function connectGlasses(read: () => GlassesScreen): Promise<() => v
 
   function lines(): string[] {
     const screen = read()
+    if (screen.subtitlesOnly) return [' ', screen.caption || ' ', ' ']
     focus(screen)
-    const row = screen.controls.map((control, index) => {
-      const symbol = control.enabled ? control.symbol : '-'
-      return index === selected ? `[${symbol}]` : ` ${symbol} `
+    const row = screen.controls.flatMap((control, index) => {
+      if (!control.enabled) return []
+      return [index === selected ? `[${control.label}]` : control.label]
     }).join('   ')
     return [
       screen.heading,
-      `${row}\n${screen.controls[selected]?.label ?? ''}`,
+      row || ' ',
       screen.caption || ' ',
     ]
   }
@@ -122,10 +123,12 @@ export async function connectGlasses(read: () => GlassesScreen): Promise<() => v
     switch (type) {
       case OsEventTypeList.CLICK_EVENT:
       case undefined:
-        if (screen.controls[selected]?.enabled) screen.controls[selected].run()
+        if (screen.subtitlesOnly) screen.showControls()
+        else if (screen.controls[selected]?.enabled) screen.controls[selected].run()
         return
       case OsEventTypeList.SCROLL_TOP_EVENT:
       case OsEventTypeList.SCROLL_BOTTOM_EVENT:
+        if (screen.subtitlesOnly) return
         for (let count = 0; count < screen.controls.length; count++) {
           selected = wrapIndex(selected + (type === OsEventTypeList.SCROLL_TOP_EVENT ? -1 : 1), screen.controls.length)
           if (screen.controls[selected].enabled) break

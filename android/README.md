@@ -23,7 +23,7 @@ Use Android 14 QPR2 or newer with single-app sharing. Start with owned or synthe
 3. Watch the detected text during playback, pause, seeking and cue changes. The probe looks for white text in the central 80% of the window width and 58–96% of its height. Use the default white caption color and a dark caption background where available. Empty reads and observations older than two seconds clear the text.
 4. Hide the player, rotate the phone and stop sharing. Confirm that the old caption clears and that starting again requires the system's consent.
 
-To test the Even Hub link, paste the current sharing session's code into the plugin on the same phone. Exercise captions on/off and verify that disconnecting or stopping sharing clears the text. With the media-controls variant, enable notification access from **Media control access** before testing commands against the active player. Some players offer only a subset of the transport actions.
+To test the Even Hub link, pair once using the companion's code on the same phone. Stop and restart sharing, and reopen the plugin to confirm it reconnects with the saved code. Exercise **Subtitles only** and verify that stopping sharing clears the text in either layout. With the media-controls variant, enable notification access from **Media control access** before testing commands against the active player. Some players offer only a subset of the transport actions.
 
 The app picker can also offer full-screen sharing. Select a single app to keep other windows outside the capture. Android can withhold protected frames. Visible text inside the crop can be mistaken for a caption, and OCR can miss words and punctuation.
 
