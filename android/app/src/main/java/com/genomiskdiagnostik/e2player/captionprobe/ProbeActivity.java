@@ -115,13 +115,15 @@ public final class ProbeActivity extends Activity {
         caption.setTextSize(20);
         content.addView(caption);
 
-        var mediaHelp = new TextView(this);
-        mediaHelp.setText(R.string.media_access_help);
-        content.addView(mediaHelp);
-        var mediaSettings = new Button(this);
-        mediaSettings.setText(R.string.media_access_settings);
-        mediaSettings.setOnClickListener(view -> startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)));
-        content.addView(mediaSettings);
+        if (BuildConfig.MEDIA_CONTROLS) {
+            var mediaHelp = new TextView(this);
+            mediaHelp.setText(R.string.media_access_help);
+            content.addView(mediaHelp);
+            var mediaSettings = new Button(this);
+            mediaSettings.setText(R.string.media_access_settings);
+            mediaSettings.setOnClickListener(view -> startActivity(new Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)));
+            content.addView(mediaSettings);
+        }
     }
 
     private void addLanguagePicker(LinearLayout content) {

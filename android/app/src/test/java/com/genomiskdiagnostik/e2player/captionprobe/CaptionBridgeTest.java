@@ -61,6 +61,17 @@ public class CaptionBridgeTest {
         }
     }
 
+    @Test
+    public void captionOnlyLinkServesTextWithoutAnActionEndpoint() throws Exception {
+        try (var bridge = new CaptionBridge(0, () -> "{\"caption\":\"Test caption\"}", null)) {
+            String host = "127.0.0.1:" + bridge.port();
+            assertTrue(request(bridge.port(), "GET /v1/state", host, "null", bridge.code(), "")
+                    .contains("Test caption"));
+            assertTrue(request(bridge.port(), "POST /v1/command/4/pause", host, "null", bridge.code(), "")
+                    .startsWith("HTTP/1.1 404"));
+        }
+    }
+
     private static String request(int port, String start, String host, String origin, String code, String extra)
             throws IOException {
         try (var socket = new Socket("127.0.0.1", port)) {

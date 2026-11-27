@@ -65,7 +65,7 @@ final class PhoneMedia {
             if (supports(state, action)) actions.put(action);
         }
         return new JSONObject().put("id", String.valueOf(generation))
-                .put("title", title == null ? "" : limit(title.toString(), 100))
+                .put("title", title == null ? "" : CaptionSample.limit(title.toString(), 100))
                 .put("playing", playing)
                 .put("positionMs", position(state, duration))
                 .put("durationMs", duration)
@@ -126,8 +126,4 @@ final class PhoneMedia {
         return Math.max(0, duration > 0 ? Math.min(position, duration) : position);
     }
 
-    static String limit(String text, int count) {
-        int length = Math.min(text.codePointCount(0, text.length()), count);
-        return text.substring(0, text.offsetByCodePoints(0, length));
-    }
 }
