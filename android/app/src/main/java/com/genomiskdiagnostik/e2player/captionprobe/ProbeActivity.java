@@ -1,6 +1,7 @@
 package com.genomiskdiagnostik.e2player.captionprobe;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.LocaleManager;
 import android.content.ClipData;
 import android.content.ClipDescription;
@@ -22,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
+import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -85,6 +87,11 @@ public final class ProbeActivity extends Activity {
         var instructions = new TextView(this);
         instructions.setText(R.string.instructions);
         content.addView(instructions);
+
+        var ocrArea = new Button(this);
+        updateOcrCropLabel(ocrArea);
+        ocrArea.setOnClickListener(view -> chooseOcrCrop(ocrArea));
+        content.addView(ocrArea);
 
         start = new Button(this);
         start.setText(R.string.choose_source);
@@ -162,6 +169,54 @@ public final class ProbeActivity extends Activity {
         });
         content.addView(label);
         content.addView(picker);
+    }
+
+    private void chooseOcrCrop(Button button) {
+        int savedPercent = CaptureService.ignoredTopPercent(this);
+        int initialPercent = CaptionRaster.isCustomCrop(savedPercent) ? savedPercent : CaptionRaster.STANDARD_TOP_PERCENT;
+        var options = new LinearLayout(this);
+        options.setOrientation(LinearLayout.VERTICAL);
+        int margin = Math.round(24 * getResources().getDisplayMetrics().density);
+        options.setPadding(margin, margin / 2, margin, 0);
+
+        var summary = new TextView(this);
+        summary.setText(getString(R.string.ocr_crop_selection, initialPercent, 100 - initialPercent));
+        options.addView(summary);
+        var slider = new SeekBar(this);
+        slider.setContentDescription(getText(R.string.ocr_crop_title));
+        slider.setMax(CaptionRaster.MAX_IGNORED_PERCENT);
+        slider.setProgress(initialPercent);
+        slider.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int percent, boolean fromUser) {
+                summary.setText(getString(R.string.ocr_crop_selection, percent, 100 - percent));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+        options.addView(slider);
+
+        new AlertDialog.Builder(this).setTitle(R.string.ocr_crop_title).setView(options)
+                .setNeutralButton(R.string.ocr_crop_standard, (dialog, which) -> {
+                    CaptureService.setIgnoredTopPercent(this, CaptionRaster.STANDARD_CROP);
+                    updateOcrCropLabel(button);
+                })
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, (dialog, which) -> {
+                    CaptureService.setIgnoredTopPercent(this, slider.getProgress());
+                    updateOcrCropLabel(button);
+                }).show();
+    }
+
+    private void updateOcrCropLabel(Button button) {
+        int percent = CaptureService.ignoredTopPercent(this);
+        String value = CaptionRaster.isCustomCrop(percent)
+                ? getString(R.string.ocr_crop_summary, percent) : getString(R.string.ocr_crop_standard);
+        button.setText(getString(R.string.ocr_crop_button, value));
     }
 
     private void copyPairingCode() {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ocr_crop_title">OCR area</string>
+    <string name="ocr_crop_button">OCR area (%1$s)</string>
+    <string name="ocr_crop_standard">Standard</string>
+    <string name="ocr_crop_summary">Top %1$d%% excluded</string>
+    <string name="ocr_crop_selection">Skip the top %1$d%% and scan the bottom %2$d%%.</string>
+</resources>

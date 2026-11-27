@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ocr_crop_title">OCR 範囲</string>
+    <string name="ocr_crop_button">OCR 範囲（%1$s）</string>
+    <string name="ocr_crop_standard">標準</string>
+    <string name="ocr_crop_summary">上部 %1$d%% を除外</string>
+    <string name="ocr_crop_selection">上部 %1$d%% を除外し、下部 %2$d%% を読み取ります。</string>
+</resources>

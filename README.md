@@ -20,6 +20,8 @@ Swipe on G2 or R1 to select a control and tap to activate it. **Subtitles only**
 
 The Even Hub plugin remembers a verified code. Select **Forget pairing** to remove it. Reinstalling the Android companion or clearing its data generates a new code.
 
+If text in the video interferes with caption recognition, open **OCR area** in Android companion 0.2.5 or later to exclude the upper part of the shared app. [Adjust the OCR area](android/README.md#adjust-the-ocr-area)
+
 ## Subtitle history
 
 Open **Subtitle history** in the Android companion, select a finished session and choose **SRT** or **TXT**. Use **Copy text** or **Save file…**. SRT times start at the beginning of screen sharing. Text recognition and session storage run locally on the phone. [History and export guide](android/README.md#subtitle-history-and-export)

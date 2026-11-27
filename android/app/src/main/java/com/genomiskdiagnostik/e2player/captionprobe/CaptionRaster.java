@@ -3,13 +3,22 @@ package com.genomiskdiagnostik.e2player.captionprobe;
 import java.nio.ByteBuffer;
 
 record CaptionRaster(int[] pixels, int width, int height) {
+    static final int STANDARD_CROP = -1;
+    static final int STANDARD_TOP_PERCENT = 58;
+    static final int MAX_IGNORED_PERCENT = 99;
     private static final int WHITE_TEXT_THRESHOLD = 205;
 
-    static CaptionRaster fromRgba(ByteBuffer frame, int stride, int frameWidth, int frameHeight) {
+    static boolean isCustomCrop(int ignoredTopPercent) {
+        return ignoredTopPercent >= 0 && ignoredTopPercent <= MAX_IGNORED_PERCENT;
+    }
+
+    static CaptionRaster fromRgba(ByteBuffer frame, int stride, int frameWidth, int frameHeight, int ignoredTopPercent) {
         int left = frameWidth / 10;
-        int top = frameHeight * 58 / 100;
+        boolean custom = isCustomCrop(ignoredTopPercent);
+        int top = frameHeight * (custom ? ignoredTopPercent : STANDARD_TOP_PERCENT) / 100;
+        int bottom = custom ? frameHeight : frameHeight * 96 / 100;
         int width = frameWidth - 2 * left;
-        int height = frameHeight * 96 / 100 - top;
+        int height = bottom - top;
         if (width <= 0 || height <= 0 || stride < frameWidth * 4) {
             throw new IllegalArgumentException("Unexpected frame dimensions");
         }
