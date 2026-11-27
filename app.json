@@ -1,7 +1,7 @@
 {
   "package_id": "com.genomiskdiagnostik.e2player",
   "name": "E2Player",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "edition": "202601",
   "min_sdk_version": "0.0.16",
   "min_app_version": "2.2.10",
@@ -10,7 +10,7 @@
     {
       "name": "network",
       "desc": "Connects only to the E2Player companion on the same Android phone.",
-      "whitelist": ["http://127.0.0.1:47841"]
+      "whitelist": ["ws://localhost:47842", "ws://127.0.0.1:47842", "http://127.0.0.1:47841"]
     }
   ],
   "supported_languages": ["en", "ja", "de", "fr", "es", "zh"]

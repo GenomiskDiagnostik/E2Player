@@ -51,6 +51,60 @@ test('disconnect prevents pending replies from restoring a caption and rejects e
   assert.equal(expired.state.caption, '')
 })
 
+test('caption link switches loopback aliases and sends commands over the working socket', async () => {
+  const urls = []
+  const messages = []
+  class TestSocket extends EventTarget {
+    constructor(url) {
+      super()
+      urls.push(url)
+      queueMicrotask(() => this.dispatchEvent(new Event(url.includes('localhost') ? 'error' : 'open')))
+    }
+    send(text) {
+      messages.push(text)
+      const data = text.includes('\nGET\n') ? '200\n' + JSON.stringify({
+        caption: 'Text from Android', mediaAccess: true,
+        media: { id: '4', title: 'Test title', playing: true, positionMs: 200, durationMs: 1000, actions: ['pause'] },
+      }) : '204\n'
+      queueMicrotask(() => this.dispatchEvent(new MessageEvent('message', { data })))
+    }
+    close() {}
+  }
+  const link = new CaptionLink(() => {}, async () => assert.fail('HTTP should not be needed'), TestSocket)
+  try {
+    assert.equal(link.connect(code), true)
+    await setImmediate()
+    assert.equal(link.state.caption, 'Text from Android')
+    assert.equal(await link.send('pause'), true)
+    assert.deepEqual(urls, [
+      'ws://localhost:47842/v1/bridge', 'ws://127.0.0.1:47842/v1/bridge', 'ws://127.0.0.1:47842/v1/bridge',
+    ])
+    assert.deepEqual(messages, [`${code}\nGET\n/v1/state`, `${code}\nPOST\n/v1/command/4/pause`])
+  } finally {
+    link.disconnect()
+  }
+})
+
+test('caption link falls back to HTTP when neither WebSocket alias is available', async () => {
+  class UnavailableSocket extends EventTarget {
+    constructor() {
+      super()
+      queueMicrotask(() => this.dispatchEvent(new Event('error')))
+    }
+    close() {}
+  }
+  const link = new CaptionLink(() => {}, async () => Response.json({
+    caption: 'HTTP caption', mediaAccess: false, media: null,
+  }), UnavailableSocket)
+  try {
+    assert.equal(link.connect(code), true)
+    await setImmediate()
+    assert.equal(link.state.caption, 'HTTP caption')
+  } finally {
+    link.disconnect()
+  }
+})
+
 test('all seven locales cover the UI and support system and manual selection', () => {
   const baseKeys = Object.keys(messages('en')).sort()
   for (const locale of Object.keys(languageNames)) {

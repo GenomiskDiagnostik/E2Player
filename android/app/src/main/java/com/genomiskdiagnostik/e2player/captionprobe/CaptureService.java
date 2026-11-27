@@ -61,6 +61,7 @@ public final class CaptureService extends Service {
     private volatile boolean closing;
     private boolean started;
     private CaptionBridge bridge;
+    private CaptionSocket socket;
 
     // These resources are used only on the capture thread.
     private ImageReader reader;
@@ -163,6 +164,14 @@ public final class CaptureService extends Service {
             pairingCode = bridge.code();
         } catch (IOException ignored) {
             linkFailed = true;
+        }
+        if (bridge != null) {
+            try {
+                socket = new CaptionSocket(CaptionSocket.PORT, bridge);
+                socket.start();
+            } catch (IOException ignored) {
+                // The HTTP bridge remains available.
+            }
         }
     }
 
@@ -274,6 +283,13 @@ public final class CaptureService extends Service {
         }
         if (capture != null) {
             capture.post(() -> {
+                if (socket != null) {
+                    try {
+                        socket.stop(250);
+                    } catch (InterruptedException interrupted) {
+                        Thread.currentThread().interrupt();
+                    }
+                }
                 if (projection != null) {
                     projection.unregisterCallback(projectionCallback);
                     projection.stop();

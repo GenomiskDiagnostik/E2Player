@@ -6,7 +6,7 @@ The project goals also include Wear-style control of the phone's active media se
 
 ## Connect on Android
 
-Install the [captions APK](android/README.md#build-locally) and the E2Player `.ehpk` (0.2.0 or later). Start single-app sharing in the companion, select the player and turn on captions in that player. Return to the companion, tap **Copy glasses code**, then paste it into the **Android** view in E2Player in the Even app and tap **Connect**. Return to the player. Use split screen with the Even app if Android suspends the plugin while the player is in front.
+Install the [captions APK](android/README.md#build-locally) and E2Player `.ehpk` version 0.2.2 or later to use the WebSocket link. Start single-app sharing in the companion, select the player and turn on captions in that player. Return to the companion, tap **Copy glasses code**, then paste it into the **Android** view in E2Player in the Even app and tap **Connect**. Return to the player. Use split screen with the Even app if Android suspends the plugin while the player is in front.
 
 Swipe on G2 or R1 to select a bottom control, then tap it. The Android view shows captions by default. System playback controls are available with the separate media-controls APK and its Android notification-access grant. Individual controls enable when the active session reports a matching action. Stopping Android screen sharing ends the connection and invalidates its code.
 
@@ -40,7 +40,7 @@ npm test
 npm run pack
 ```
 
-The pack command type-checks, builds, and writes `e2player.ehpk` at the repository root. GitHub Actions verifies the test and pack commands. The only allowed network destination is the Android companion at `http://127.0.0.1:47841`.
+The pack command type-checks, builds, and writes `e2player.ehpk` at the repository root. GitHub Actions verifies the test and pack commands. The network allowlist contains the Android companion's loopback WebSocket on port `47842` and its HTTP fallback on port `47841`.
 
 For a physical-device preview, use [Even's QR testing guide](https://hub.evenrealities.com/docs/test/local-testing) with the phone and development machine on the same network. Use `npm exec -- vite --host 0.0.0.0 --strictPort` for this LAN test. For installation of the packaged build, follow the [Even Hub packaging and beta guide](https://hub.evenrealities.com/docs/ship/packaging).
 

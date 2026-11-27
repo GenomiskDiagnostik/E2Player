@@ -1,10 +1,16 @@
 package com.genomiskdiagnostik.e2player.captionprobe;
 
+import org.java_websocket.client.WebSocketClient;
+import org.java_websocket.handshake.ServerHandshake;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.net.Socket;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.Assert.assertEquals;
@@ -69,6 +75,45 @@ public class CaptionBridgeTest {
                     .contains("Test caption"));
             assertTrue(request(bridge.port(), "POST /v1/command/4/pause", host, "null", bridge.code(), "")
                     .startsWith("HTTP/1.1 404"));
+        }
+    }
+
+    @Test
+    public void webSocketUsesTheSameSessionCodeAndRestrictsCommands() throws Exception {
+        try (var bridge = new CaptionBridge(0, () -> "{\"caption\":\"Test caption\"}", null)) {
+            var server = new CaptionSocket(0, bridge);
+            server.start();
+            try {
+                long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(3);
+                while (server.getPort() == 0 && System.nanoTime() < deadline) Thread.sleep(10);
+                int port = server.getPort();
+                assertTrue(port > 0);
+                assertEquals("401\n", webSocketRequest(port, "wrong\nGET\n/v1/state"));
+                assertEquals("200\n{\"caption\":\"Test caption\"}",
+                        webSocketRequest(port, bridge.code() + "\nGET\n/v1/state"));
+                assertEquals("404\n",
+                        webSocketRequest(port, bridge.code() + "\nPOST\n/v1/command/4/pause"));
+            } finally {
+                server.stop(1000);
+            }
+        }
+    }
+
+    private static String webSocketRequest(int port, String request) throws Exception {
+        var response = new CompletableFuture<String>();
+        var client = new WebSocketClient(URI.create("ws://127.0.0.1:" + port + "/v1/bridge"),
+                Map.of("Origin", "http://127.0.0.1:49152")) {
+            @Override public void onOpen(ServerHandshake handshake) {}
+            @Override public void onClose(int code, String reason, boolean remote) {}
+            @Override public void onMessage(String text) { response.complete(text); }
+            @Override public void onError(Exception failure) { response.completeExceptionally(failure); }
+        };
+        try {
+            assertTrue(client.connectBlocking(3, TimeUnit.SECONDS));
+            client.send(request);
+            return response.get(3, TimeUnit.SECONDS);
+        } finally {
+            client.close();
         }
     }
 

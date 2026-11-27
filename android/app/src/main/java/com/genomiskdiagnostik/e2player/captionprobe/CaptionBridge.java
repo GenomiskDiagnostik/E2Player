@@ -94,10 +94,7 @@ final class CaptionBridge implements AutoCloseable {
         String method = request[0].equals("OPTIONS") ? headers.get("access-control-request-method") : request[0];
         boolean read = "GET".equals(method) && path.equals("/v1/state");
         String[] segments = path.split("/", -1);
-        boolean control = command != null && "POST".equals(method) && segments.length == 5
-                && segments[0].isEmpty() && segments[1].equals("v1") && segments[2].equals("command")
-                && segments[3].matches("[0-9]{1,12}")
-                && segments[4].matches("play|pause|stop|previous|next");
+        boolean control = supportsCommands() && "POST".equals(method) && isCommandPath(segments);
         if (!read && !control) {
             reply(client, "404 Not Found", origin, "");
             return;
@@ -106,17 +103,16 @@ final class CaptionBridge implements AutoCloseable {
             reply(client, "204 No Content", origin, "");
             return;
         }
-        byte[] supplied = headers.getOrDefault("authorization", "").getBytes(StandardCharsets.US_ASCII);
-        if (!MessageDigest.isEqual(authorization, supplied)) {
+        if (!authorized(headers.getOrDefault("authorization", ""))) {
             reply(client, "401 Unauthorized", origin, "");
             return;
         }
         if (listener.isClosed()) return;
         pairedOrigin = origin;
         if (read) {
-            reply(client, "200 OK", origin, state.get());
+            reply(client, "200 OK", origin, snapshot());
         } else {
-            boolean sent = command.test(segments[3], segments[4]);
+            boolean sent = sendCommand(segments[3], segments[4]);
             reply(client, sent ? "204 No Content" : "409 Conflict", origin, "");
         }
     }
@@ -139,7 +135,30 @@ final class CaptionBridge implements AutoCloseable {
         return null;
     }
 
-    private static boolean validOrigin(String origin) {
+    boolean authorized(String supplied) {
+        return !listener.isClosed()
+                && MessageDigest.isEqual(authorization, supplied.getBytes(StandardCharsets.US_ASCII));
+    }
+
+    synchronized String snapshot() {
+        return state.get();
+    }
+
+    boolean supportsCommands() {
+        return command != null;
+    }
+
+    synchronized boolean sendCommand(String id, String action) {
+        return command != null && command.test(id, action);
+    }
+
+    static boolean isCommandPath(String[] segments) {
+        return segments.length == 5 && segments[0].isEmpty() && segments[1].equals("v1")
+                && segments[2].equals("command") && segments[3].matches("[0-9]{1,12}")
+                && segments[4].matches("play|pause|stop|previous|next");
+    }
+
+    static boolean validOrigin(String origin) {
         if (origin == null || origin.length() > 256) return false;
         if (origin.equals("null")) return true; // An Even Hub file-backed WebView may have an opaque origin.
         try {
