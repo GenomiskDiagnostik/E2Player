@@ -1,18 +1,28 @@
 # E2Player
 
-E2Player is an Even Hub plugin for Even G2 and the R1 ring. Its default **Android** view connects to the caption companion on the same phone. It displays player-rendered captions recognized by the companion. **Demo** runs the bundled test video and audio independently.
+E2Player displays captions from an Android video player on Even G2 glasses. It uses an Even Hub plugin and a companion app on the same Android phone. You can use the glasses or an Even R1 ring to navigate the controls.
 
 The project goals also include Wear-style control of the phone's active media session, G2 voice search for YouTube, and synced captions on the glasses for eligible videos. [PLANS.md](PLANS.md) records the platform constraints and the acceptance checks.
 
-## Connect on Android
+## Install E2Player
 
-Install version 0.2.3 or later of both the [captions APK](android/README.md#build-locally) and E2Player `.ehpk` for persistent pairing. Start single-app sharing in the companion, select the player and turn on captions in that player. For the first pairing, return to the companion, tap **Copy glasses code**, paste it into the **Android** view in E2Player in the Even app and tap **Connect**. Use split screen with the Even app if Android suspends the plugin while the player is in front.
+1. **Even G2 plugin.** In the Even Realities app, open the **Even Hub** tab, search for **E2Player**, and tap **Install** when the public listing is available. If you have a beta invitation, follow the invitation and install the app from the beta section. [Even Hub installation guide](https://support.evenrealities.com/hc/en-us/articles/15688149217167-Even-Hub)
+2. **Android companion.** Use an Android phone with Android 14 QPR2 or later and build the APK from this repository. Both APK flavors show captions and export subtitle history. The media-controls build also supports playback commands after you grant it **Media control access** on the phone. [Android build and installation guide](android/README.md#build-and-install-the-android-app)
+3. **Versions.** Use the Even Hub plugin 0.2.3 or later for persistent pairing and **Subtitles only**. Android companion 0.2.4 adds local subtitle history and export.
 
-Swipe on G2 or R1 to select a bottom control, then tap it. **Subtitles only** moves captions to the bottom and hides the title, status and buttons. Tap once in that view to show the controls again. Captions appear in both layouts. The G2 shows playback buttons supported by the active session when using the media-controls APK with Android notification access.
+## Pair and watch
 
-The Even Hub plugin remembers a verified code. When screen sharing stops, the captions clear and E2Player reconnects when you start sharing again. Select **Forget pairing** in the Even phone view to remove the remembered code. Reinstalling the Android companion or clearing its data requires a new pairing.
+1. Open the Android companion and tap **Choose app to share**. Select the player in Android's single-app sharing picker, then turn on captions in that player.
+2. For the first pairing, return to the companion and tap **Copy glasses code**. Open E2Player in the Even Realities app, select **Android**, paste the code, and tap **Connect**.
+3. Return to the player and keep its captions visible. Use split screen with the Even Realities app if the phone suspends the plugin in the background. Locking the phone can end screen sharing, and Android asks for consent again when you start a new session. [Android screen-sharing behavior](https://developer.android.com/media/grow/media-projection#status-bar-chip-and-auto-stop)
 
-Android companion 0.2.4 saves recognized subtitles locally. Open **Subtitle history** on the phone to select a finished session, copy its text, or save it as SRT or TXT. See the [history and export guide](android/README.md#subtitle-history-and-export).
+Swipe on G2 or R1 to select a control and tap to activate it. **Subtitles only** moves captions to the bottom and hides the rest of the display. Tap once to show the controls again. With the media-controls build, playback buttons appear when the active player advertises the matching actions. Select **Demo** in the Even app to try the controls with bundled test media.
+
+The Even Hub plugin remembers a verified code. Select **Forget pairing** to remove it. Reinstalling the Android companion or clearing its data generates a new code.
+
+## Subtitle history
+
+Open **Subtitle history** in the Android companion, select a finished session and choose **SRT** or **TXT**. Use **Copy text** or **Save file…**. SRT times start at the beginning of screen sharing. Text recognition and session storage run locally on the phone. [History and export guide](android/README.md#subtitle-history-and-export)
 
 Both apps follow the system language by default and provide a **Language** selector for English, Japanese, Danish, German, French, Spanish and Simplified Chinese. This changes the interface language. OCR still uses Danish and English models and shows the words recognized from the selected player. The Even Hub CLI does not accept Danish in the app listing metadata, so Danish is selectable inside E2Player.
 
