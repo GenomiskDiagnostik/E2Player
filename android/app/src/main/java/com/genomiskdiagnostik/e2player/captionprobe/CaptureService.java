@@ -159,7 +159,7 @@ public final class CaptureService extends Service {
         if (closing) return;
         var media = new PhoneMedia(this);
         try {
-            bridge = new CaptionBridge(CaptionBridge.PORT, () -> bridgeSnapshot(media),
+            bridge = new CaptionBridge(CaptionBridge.PORT, loadPairingCode(), () -> bridgeSnapshot(media),
                     BuildConfig.MEDIA_CONTROLS ? (id, action) -> !closing && media.send(id, action) : null);
             pairingCode = bridge.code();
         } catch (IOException ignored) {
@@ -173,6 +173,17 @@ public final class CaptureService extends Service {
                 // The HTTP bridge remains available.
             }
         }
+    }
+
+    private String loadPairingCode() throws IOException {
+        var preferences = getSharedPreferences("e2player-pairing", MODE_PRIVATE);
+        String code = preferences.getString("code", "");
+        if (code != null && code.matches("[A-Za-z0-9_-]{22}")) return code;
+        String replacement = CaptionBridge.newCode();
+        if (!preferences.edit().putString("code", replacement).commit()) {
+            throw new IOException("Could not store the pairing code");
+        }
+        return replacement;
     }
 
     private String bridgeSnapshot(PhoneMedia media) {

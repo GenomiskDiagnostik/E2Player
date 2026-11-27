@@ -11,19 +11,18 @@ export interface Track {
   cues: readonly Cue[]
 }
 
-export type Command = 'previous' | 'togglePlayback' | 'stop' | 'next' | 'toggleCaptions'
+export type Command = 'previous' | 'togglePlayback' | 'stop' | 'next'
 
 export interface PlaybackSnapshot {
   track: Track
   status: 'Stopped' | 'Paused' | 'Playing' | 'Starting'
   time: number
   duration: number
-  captionsEnabled: boolean
   caption: string
   error: '' | 'loadError' | 'playBlocked' | 'playError'
 }
 
-export const commands: readonly Command[] = ['previous', 'togglePlayback', 'stop', 'next', 'toggleCaptions']
+export const commands: readonly Command[] = ['previous', 'togglePlayback', 'stop', 'next']
 
 export function wrapIndex(index: number, count: number): number {
   return (index % count + count) % count
@@ -48,7 +47,6 @@ export class Playback {
   private stopped = true
   private starting = false
   private attempt = 0
-  private captionsEnabled = false
   private error: PlaybackSnapshot['error'] = ''
   private readonly listeners = new Set<(snapshot: PlaybackSnapshot) => void>()
 
@@ -75,8 +73,7 @@ export class Playback {
       status,
       time,
       duration: Number.isFinite(duration) ? duration : 0,
-      captionsEnabled: this.captionsEnabled,
-      caption: this.captionsEnabled && status !== 'Stopped' ? cueAt(track.cues, time) : '',
+      caption: status !== 'Stopped' ? cueAt(track.cues, time) : '',
       error: this.error,
     }
   }
@@ -114,10 +111,6 @@ export class Playback {
         if (resume) void this.play()
         break
       }
-      case 'toggleCaptions':
-        this.captionsEnabled = !this.captionsEnabled
-        this.publish()
-        break
     }
   }
 

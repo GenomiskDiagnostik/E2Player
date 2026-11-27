@@ -19,7 +19,13 @@ export interface LinkState {
   media: PhoneMedia | null
 }
 
+export interface PairingStorage {
+  read(): Promise<string>
+  write(code: string): Promise<boolean>
+}
+
 const empty = { caption: '', mediaAccess: false, media: null }
+const pairingCode = /^[A-Za-z0-9_-]{22}$/
 type Session = { code: string; timer?: ReturnType<typeof setTimeout>; abort: AbortController; transport: number }
 type Method = 'GET' | 'POST'
 type Transport = (code: string, path: string, method: Method, signal: AbortSignal) => Promise<Response>
@@ -78,11 +84,18 @@ function stateFrom(value: unknown): LinkState {
 export class CaptionLink {
   private session?: Session
   private current: LinkState = { status: 'unpaired', ...empty }
+  private rememberedCode = ''
+  private pairingRevision = 0
+  private suspended = false
+  private writes = Promise.resolve()
   private readonly changed: (state: LinkState) => void
   private readonly transports: Transport[]
+  private readonly storage?: PairingStorage
 
-  constructor(changed: (state: LinkState) => void, fetcher: typeof fetch = fetch, Socket?: typeof WebSocket) {
+  constructor(changed: (state: LinkState) => void, fetcher: typeof fetch = fetch, Socket?: typeof WebSocket,
+    storage?: PairingStorage) {
     this.changed = changed
+    this.storage = storage
     const http: Transport = (code, path, method, signal) => {
       const options: RequestInit & { targetAddressSpace: 'loopback' } = {
         method, signal, headers: { Authorization: `Bearer ${code}` }, mode: 'cors',
@@ -98,18 +111,58 @@ export class CaptionLink {
   }
 
   connect(code: string): boolean {
-    if (!/^[A-Za-z0-9_-]{22}$/.test(code)) return false
+    if (!pairingCode.test(code)) return false
+    this.pairingRevision++
+    this.startSession(code)
+    return true
+  }
+
+  async restorePairing(): Promise<void> {
+    const revision = this.pairingRevision
+    try {
+      const code = await this.storage?.read()
+      if (revision !== this.pairingRevision || this.session || !code || !pairingCode.test(code)) return
+      this.rememberedCode = code
+      if (!this.suspended) this.startSession(code)
+    } catch {
+      console.warn('[E2Player] Could not read the saved pairing')
+    }
+  }
+
+  suspend(): void {
+    this.suspended = true
+    this.endSession()
+    this.setState({ status: 'unpaired', ...empty })
+  }
+
+  resume(): void {
+    if (!this.suspended) return
+    this.suspended = false
+    if (this.rememberedCode) this.startSession(this.rememberedCode)
+  }
+
+  private startSession(code: string): void {
     this.endSession()
     const session = { code, abort: new AbortController(), transport: 0 }
     this.session = session
     this.setState({ status: 'connecting', ...empty })
     void this.poll(session)
-    return true
   }
 
   disconnect(): void {
+    this.pairingRevision++
+    this.savePairing('')
     this.endSession()
     this.setState({ status: 'unpaired', ...empty })
+  }
+
+  private savePairing(code: string): void {
+    this.rememberedCode = code
+    const storage = this.storage
+    if (!storage) return
+    this.writes = this.writes.then(async () => {
+      if (!await storage.write(code)) throw new Error('Storage refused the write')
+    }).catch(() => console.warn('[E2Player] Could not save the pairing'))
   }
 
   async send(action: MediaCommand): Promise<boolean> {
@@ -160,6 +213,7 @@ export class CaptionLink {
       const response = await this.read(session)
       if (this.session !== session) return
       if (response.status === 401) {
+        if (this.rememberedCode === session.code) this.savePairing('')
         this.endSession()
         this.setState({ status: 'rejected', ...empty })
         return
@@ -168,7 +222,11 @@ export class CaptionLink {
         throw new Error('Bridge unavailable')
       }
       const data: unknown = await response.json()
-      if (this.session === session) this.setState(stateFrom(data))
+      if (this.session === session) {
+        const state = stateFrom(data)
+        if (this.rememberedCode !== session.code) this.savePairing(session.code)
+        this.setState(state)
+      }
     } catch {
       if (this.session === session) this.setState({ status: 'unavailable', ...empty })
       delay = 1100

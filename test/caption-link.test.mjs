@@ -34,7 +34,7 @@ test('caption link displays text and sends only reported controls to the current
   assert.equal(link.state.caption, '')
 })
 
-test('disconnect prevents pending replies from restoring a caption and rejects expired codes', async () => {
+test('disconnect prevents pending replies from restoring a caption and rejects incorrect codes', async () => {
   let complete
   const delayed = new CaptionLink(() => {}, () => new Promise(resolve => { complete = resolve }))
   assert.equal(delayed.connect(code), true)
@@ -49,6 +49,47 @@ test('disconnect prevents pending replies from restoring a caption and rejects e
   await setImmediate()
   assert.equal(expired.state.status, 'rejected')
   assert.equal(expired.state.caption, '')
+})
+
+test('an accepted pairing survives suspension and reopening until explicitly forgotten', async () => {
+  let saved = ''
+  const storage = {
+    read: async () => saved,
+    write: async code => { saved = code; return true },
+  }
+  let available = true
+  const fetcher = async (_url, options) => {
+    assert.equal(options.headers.Authorization, `Bearer ${code}`)
+    return available
+      ? Response.json({ caption: 'Caption', mediaAccess: false, media: null })
+      : new Response(null, { status: 503 })
+  }
+  const first = new CaptionLink(() => {}, fetcher, undefined, storage)
+  const reopened = new CaptionLink(() => {}, fetcher, undefined, storage)
+  try {
+    assert.equal(first.connect(code), true)
+    await setImmediate()
+    assert.equal(saved, code)
+    first.suspend()
+    assert.equal(first.state.caption, '')
+
+    available = false
+    await reopened.restorePairing()
+    await setImmediate()
+    assert.equal(reopened.state.status, 'unavailable')
+    assert.equal(saved, code)
+
+    available = true
+    reopened.suspend()
+    reopened.resume()
+    await setImmediate()
+    assert.equal(reopened.state.caption, 'Caption')
+  } finally {
+    first.suspend()
+    reopened.disconnect()
+    await setImmediate()
+  }
+  assert.equal(saved, '')
 })
 
 test('caption link switches loopback aliases and sends commands over the working socket', async () => {

@@ -1,4 +1,5 @@
 import './style.css'
+import { waitForEvenAppBridge } from '@evenrealities/even_hub_sdk'
 import { CaptionLink, type MediaCommand } from './caption-link.ts'
 import { demoTracks } from './demo.ts'
 import { connectGlasses, type GlassesControl, type GlassesScreen } from './glasses.ts'
@@ -28,24 +29,26 @@ let source: GlassesScreen['source'] = 'android'
 let device: Message = 'phonePreview'
 let preference = readLanguagePreference()
 let t = messages(resolveLocale(preference, navigator.languages))
-let showPhoneCaptions = true
+let subtitlesOnly = false
 let commandFailed = false
 let refreshGlasses: (() => void) | undefined
+const hub = waitForEvenAppBridge()
+const pairingKey = 'e2player.android.pairing'
 const link = new CaptionLink(() => {
   if (source === 'android') render()
-}, fetch, globalThis.WebSocket)
+}, fetch, globalThis.WebSocket, {
+  read: async () => (await hub).getLocalStorage(pairingKey),
+  write: async value => (await hub).setLocalStorage(pairingKey, value),
+})
 
 const transport = ['previous', 'play', 'stop', 'next', 'captions'] as const
 type TransportIcon = typeof transport[number] | 'pause'
 type Control = GlassesControl & { icon: TransportIcon; pressed?: boolean }
 const statuses = { Stopped: 'stopped', Paused: 'paused', Playing: 'playing', Starting: 'starting' } as const
 
-function toggleCaptions(): void {
-  if (source === 'demo') playback.run('toggleCaptions')
-  else {
-    showPhoneCaptions = !showPhoneCaptions
-    render()
-  }
+function setSubtitlesOnly(enabled: boolean): void {
+  subtitlesOnly = enabled
+  render()
 }
 
 function getControls(): Control[] {
@@ -53,12 +56,11 @@ function getControls(): Control[] {
   const phone = link.state.media
   const demo = source === 'demo'
   const isPlaying = demo ? snapshot.status === 'Playing' || snapshot.status === 'Starting' : phone?.playing
-  const captionsOn = demo ? snapshot.captionsEnabled : showPhoneCaptions
   const playAction = isPlaying ? 'pause' : 'play'
 
-  function mediaAction(icon: MediaCommand, symbol: string, demoCommand: Command): Control {
+  function mediaAction(icon: MediaCommand, demoCommand: Command): Control {
     return {
-      icon, symbol, label: t[icon], enabled: demo || Boolean(phone?.actions.includes(icon)),
+      icon, label: t[icon], enabled: demo || Boolean(phone?.actions.includes(icon)),
       run: () => {
         if (demo) playback.run(demoCommand)
         else void link.send(icon).then(success => {
@@ -70,12 +72,12 @@ function getControls(): Control[] {
   }
 
   return [
-    mediaAction('previous', '|<', 'previous'),
-    mediaAction(playAction, isPlaying ? '||' : '>', 'togglePlayback'),
-    mediaAction('stop', '[]', 'stop'),
-    mediaAction('next', '>|', 'next'),
-    { icon: 'captions', symbol: captionsOn ? 'CC+' : 'CC-', label: captionsOn ? t.captionsOn : t.captionsOff,
-      enabled: true, run: toggleCaptions, pressed: captionsOn },
+    mediaAction('previous', 'previous'),
+    mediaAction(playAction, 'togglePlayback'),
+    mediaAction('stop', 'stop'),
+    mediaAction('next', 'next'),
+    { icon: 'captions', label: subtitlesOnly ? t.showControls : t.subtitlesOnly,
+      enabled: true, run: () => setSubtitlesOnly(!subtitlesOnly), pressed: subtitlesOnly },
   ]
 }
 
@@ -104,7 +106,7 @@ function demoTitle(): string {
 }
 
 function liveCaption(): string {
-  return source === 'demo' ? playback.snapshot.caption : showPhoneCaptions ? link.state.caption : ''
+  return source === 'demo' ? playback.snapshot.caption : link.state.caption
 }
 
 function phoneTime(): string {
@@ -119,12 +121,14 @@ function readGlasses(): GlassesScreen {
   const snapshot = playback.snapshot
   const status = link.state.status
   const androidStatus = status === 'connected' ? phoneTime() || t.connected
-    : status === 'connecting' ? t.connecting : t.pairPrompt
+    : status === 'connecting' || status === 'unavailable' ? t.connecting : t.pairPrompt
   const heading = source === 'android'
     ? `${phone?.title || t.phoneMedia}\n${androidStatus}`
     : `${demoTitle()}\n${t[statuses[snapshot.status]]}  ${formatTime(snapshot.time)} / ${formatTime(snapshot.duration)}`
-  return { source, heading, controls: getControls(),
-    caption: source === 'demo' && snapshot.error ? t[snapshot.error] : liveCaption() }
+  return {
+    source, heading, controls: getControls(), subtitlesOnly, showControls: () => setSubtitlesOnly(false),
+    caption: source === 'demo' && snapshot.error && !subtitlesOnly ? t[snapshot.error] : liveCaption(),
+  }
 }
 
 function render(): void {
@@ -207,7 +211,8 @@ language.addEventListener('change', () => {
   applyLanguage()
 })
 window.addEventListener('languagechange', applyLanguage)
-window.addEventListener('pagehide', () => link.disconnect())
+window.addEventListener('pagehide', () => link.suspend())
+window.addEventListener('pageshow', () => link.resume())
 androidSource.addEventListener('click', () => setSource('android'))
 demoSource.addEventListener('click', () => setSource('demo'))
 seek.addEventListener('input', () => playback.seek(seek.valueAsNumber))
@@ -224,7 +229,8 @@ disconnect.addEventListener('click', () => link.disconnect())
 
 playback.subscribe(() => { if (source === 'demo') render() })
 applyLanguage()
-void connectGlasses(readGlasses).then(refresh => {
+void link.restorePairing()
+void hub.then(bridge => connectGlasses(bridge, readGlasses)).then(refresh => {
   refreshGlasses = refresh
   device = 'hubConnected'
   render()

@@ -20,7 +20,7 @@ import static org.junit.Assert.assertTrue;
 
 public class CaptionBridgeTest {
     @Test
-    public void pairsFirstAuthorizedOriginAndUsesOnlySupportedRoutes() throws Exception {
+    public void updatesThePairedOriginOnAuthorizedReadsAndUsesOnlySupportedRoutes() throws Exception {
         var sent = new AtomicInteger();
         try (var bridge = new CaptionBridge(0, () -> "{\"caption\":\"Test caption\"}", (id, action) ->
                 id.equals("4") && action.equals("pause") && sent.incrementAndGet() > 0)) {
@@ -41,21 +41,27 @@ public class CaptionBridgeTest {
             String text = request(bridge.port(), "GET /v1/state", host, origin, bridge.code(), "");
             assertTrue(text.startsWith("HTTP/1.1 200"));
             assertTrue(text.contains("Test caption"));
-            String other = request(bridge.port(), "GET /v1/state", host, "https://other.example", bridge.code(), "");
-            assertTrue(other.startsWith("HTTP/1.1 403"));
-            assertFalse(other.contains("Test caption"));
+            String otherOrigin = "https://other.example";
+            assertTrue(request(bridge.port(), "GET /v1/state", host, otherOrigin, "wrong", "")
+                    .startsWith("HTTP/1.1 401"));
+            assertTrue(request(bridge.port(), "POST /v1/command/4/pause", host, otherOrigin, bridge.code(), "")
+                    .startsWith("HTTP/1.1 403"));
             assertTrue(request(bridge.port(), "POST /v1/command/4/pause", host, origin, "wrong", "")
                     .startsWith("HTTP/1.1 401"));
             assertTrue(request(bridge.port(), "POST /v1/command/3/pause", host, origin, bridge.code(), "")
                     .startsWith("HTTP/1.1 409"));
             assertTrue(request(bridge.port(), "POST /v1/command/4/pause", host, origin, bridge.code(), "")
                     .startsWith("HTTP/1.1 204"));
+            assertTrue(request(bridge.port(), "GET /v1/state", host, otherOrigin, bridge.code(), "")
+                    .startsWith("HTTP/1.1 200"));
+            assertTrue(request(bridge.port(), "POST /v1/command/4/pause", host, origin, bridge.code(), "")
+                    .startsWith("HTTP/1.1 403"));
             assertEquals(1, sent.get());
         }
     }
 
     @Test
-    public void newCaptureRejectsOldCodeAndAcceptsOpaqueWebViewOrigin() throws Exception {
+    public void aDifferentInstallationCodeIsRejectedEvenWithAnOpaqueOrigin() throws Exception {
         try (var first = new CaptionBridge(0, () -> "{}", (id, action) -> false);
              var second = new CaptionBridge(0, () -> "{}", (id, action) -> false)) {
             assertNotEquals(first.code(), second.code());
@@ -64,6 +70,18 @@ public class CaptionBridgeTest {
                     .startsWith("HTTP/1.1 401"));
             assertTrue(request(second.port(), "GET /v1/state", host, "null", second.code(), "")
                     .contains("Access-Control-Allow-Origin: null"));
+        }
+    }
+
+    @Test
+    public void restartedCaptureAcceptsTheSameStoredCode() throws Exception {
+        String storedCode = CaptionBridge.newCode();
+        for (int capture = 0; capture < 2; capture++) {
+            try (var bridge = new CaptionBridge(0, storedCode, () -> "{}", null)) {
+                String host = "127.0.0.1:" + bridge.port();
+                assertTrue(request(bridge.port(), "GET /v1/state", host, "null", storedCode, "")
+                        .startsWith("HTTP/1.1 200"));
+            }
         }
     }
 

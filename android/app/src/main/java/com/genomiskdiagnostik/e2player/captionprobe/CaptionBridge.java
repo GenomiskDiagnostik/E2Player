@@ -31,11 +31,13 @@ final class CaptionBridge implements AutoCloseable {
     private String pairedOrigin;
 
     CaptionBridge(int port, Supplier<String> state, BiPredicate<String, String> command) throws IOException {
+        this(port, newCode(), state, command);
+    }
+
+    CaptionBridge(int port, String code, Supplier<String> state, BiPredicate<String, String> command) throws IOException {
         this.state = state;
         this.command = command;
-        byte[] secret = new byte[16];
-        new SecureRandom().nextBytes(secret);
-        code = Base64.getUrlEncoder().withoutPadding().encodeToString(secret);
+        this.code = code;
         authorization = ("Bearer " + code).getBytes(StandardCharsets.US_ASCII);
         try {
             listener.setReuseAddress(true);
@@ -47,6 +49,12 @@ final class CaptionBridge implements AutoCloseable {
         var thread = new Thread(this::serve, "e2player-loopback");
         thread.setDaemon(true);
         thread.start();
+    }
+
+    static String newCode() {
+        byte[] secret = new byte[16];
+        new SecureRandom().nextBytes(secret);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(secret);
     }
 
     int port() {
@@ -84,7 +92,6 @@ final class CaptionBridge implements AutoCloseable {
         String origin = headers.get("origin");
         if (!("127.0.0.1:" + port()).equals(headers.get("host"))
                 || !validOrigin(origin)
-                || (pairedOrigin != null && !pairedOrigin.equals(origin))
                 || headers.containsKey("transfer-encoding")
                 || !headers.getOrDefault("content-length", "0").equals("0")) {
             reply(client, "403 Forbidden", null, "");
@@ -99,6 +106,10 @@ final class CaptionBridge implements AutoCloseable {
             reply(client, "404 Not Found", origin, "");
             return;
         }
+        if (control && !origin.equals(pairedOrigin)) {
+            reply(client, "403 Forbidden", null, "");
+            return;
+        }
         if (request[0].equals("OPTIONS")) {
             reply(client, "204 No Content", origin, "");
             return;
@@ -108,8 +119,8 @@ final class CaptionBridge implements AutoCloseable {
             return;
         }
         if (listener.isClosed()) return;
-        pairedOrigin = origin;
         if (read) {
+            pairedOrigin = origin;
             reply(client, "200 OK", origin, snapshot());
         } else {
             boolean sent = sendCommand(segments[3], segments[4]);

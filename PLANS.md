@@ -27,8 +27,9 @@ Sources: [YouTube IFrame Player API](https://developers.google.com/youtube/ifram
 - [x] Build an offline Android probe for visible captions via single-app capture and OCR. See [decision record](docs/adr/0001-read-rendered-captions.md) and [probe setup](android/README.md).
 - [ ] Validate the local probe on an Android phone with synthetic captions. Check capture consent, crop, timing, pause, seek, rotation, track changes, protected frames and clearing when the source is hidden or capture stops. Measure recognition accuracy and latency before adding scripts or an adjustable crop.
 - [ ] Confirm permitted YouTube use and test the selected player captions on a representative set of videos. Check subtitles off, absent tracks, auto captions and selected languages. Use the visible cue for synchronization and validate the playback-position source separately.
-- [x] Link the companion to Even Hub with a session-scoped code and an IPv4 loopback endpoint. Show paired captions by default, with a separate demo source.
+- [x] Link the companion to Even Hub with an authenticated IPv4 loopback endpoint. Show paired captions by default, with a separate demo source.
 - [x] Add an authenticated loopback WebSocket for packaged WebViews that block HTTP fetches. Verify with a synthetic caption and transport command in the official simulator.
-- [ ] Confirm packaged loopback access, G2 display, R1 toggle, and text expiry on paired hardware while the player is visible. Check Japanese and Chinese HUD glyph coverage on the firmware.
+- [x] Add a subtitles-only G2 view and keep a verified pairing between capture sessions and plugin launches.
+- [ ] Verify subtitles-only layout, R1 navigation, automatic reconnection and text expiry on paired hardware while the player is visible. Check Japanese and Chinese HUD glyph coverage on the firmware. Paired loopback and subtitle display were confirmed on the Galaxy Z Fold6 for 0.2.2.
 
 Sources: [YouTube IFrame Player API](https://developers.google.com/youtube/iframe_api_reference), [YouTube Captions download](https://developers.google.com/youtube/v3/docs/captions/download), [Android MediaProjection](https://developer.android.com/media/grow/media-projection).
