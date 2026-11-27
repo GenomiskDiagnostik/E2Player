@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application>
+        <!-- Keep the shared foreground-service type visible to flavor manifest lint. -->
+        <service android:name=".CaptureService" android:foregroundServiceType="mediaProjection" />
         <service
             android:name=".MediaAccessService"
             android:exported="false"
