@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtitle_history">字幕履歴</string>
+    <string name="history_description">セッションはこのスマートフォンに保存されます。SRT の時刻は画面共有の開始から計算されます。</string>
+    <string name="history_session">セッション</string>
+    <string name="history_format">形式</string>
+    <string name="history_empty">保存された字幕はまだありません。</string>
+    <string name="history_loading">字幕を読み込み中…</string>
+    <string name="history_truncated">長いセッションのプレビューです。全文はファイルに保存してください。</string>
+    <string name="history_copy">テキストをコピー</string>
+    <string name="history_copied">字幕をコピーしました。</string>
+    <string name="history_copy_failed">テキストをコピーできませんでした。ファイルとして保存してください。</string>
+    <string name="history_save">ファイルを保存…</string>
+    <string name="history_saved">字幕ファイルを保存しました。</string>
+    <string name="history_save_failed">字幕ファイルを保存できませんでした。</string>
+    <string name="history_delete">セッションを削除</string>
+    <string name="history_delete_prompt">このセッションを E2Player から削除しますか？</string>
+    <string name="history_error">字幕履歴にアクセスできませんでした。</string>
+    <string name="history_write_failed">一部の字幕を履歴に保存できませんでした。</string>
+</resources>

@@ -27,6 +27,14 @@ To test the Even Hub link, pair once using the companion's code on the same phon
 
 The app picker can also offer full-screen sharing. Select a single app to keep other windows outside the capture. Android can withhold protected frames. Visible text inside the crop can be mistaken for a caption, and OCR can miss words and punctuation.
 
+## Subtitle history and export
+
+Open **Subtitle history** after stopping screen sharing. Select a session and choose **SRT** or **TXT**. The preview is selectable. **Copy text** copies the selected format, and **Save file…** opens Android's file picker. For very long sessions, save the complete file and use the preview to copy excerpts. **Delete session** removes the copy inside E2Player.
+
+Sessions with recognized text are saved as cues in the app's private storage, excluded from backup and device transfer. The history contains recognized text and timestamps. TXT exports one line per cue. SRT uses the elapsed time since Android screen sharing started, including gaps, so a session with pauses or seeks follows the capture timeline. A force stop can omit the last unfinished cue.
+
+On Android 15 QPR1 and later, locking the phone ends screen projection. E2Player closes and saves that session. Keep the shared player visible to continue reading captions. [Android MediaProjection](https://developer.android.com/media/grow/media-projection#status-bar-chip-and-auto-stop).
+
 ## Dependencies
 
 The APK uses [Tesseract4Android](https://github.com/adaptech-cz/Tesseract4Android/tree/4.9.0) and [Tesseract fast models](https://github.com/tesseract-ocr/tessdata_fast/tree/65727574dfcd264acbb0c3e07860e4e9e9b22185). See their licenses and Tesseract4Android's native dependency notices before distributing the probe.

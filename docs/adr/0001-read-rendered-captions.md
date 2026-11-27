@@ -22,4 +22,6 @@ The packaged Even Hub WebView can block local HTTP fetches before the Android br
 
 The direct-install captions variant exposes the caption endpoint only. The media-controls variant uses Android notification access for media discovery and reads no notification contents. Its authenticated commands include the last reported session identifier and are checked against the active session and its advertised actions.
 
+The Android companion archives completed OCR cues in an app-private SQLite database, excluded from backup and device transfer. Repeated observations become one cue until the text changes, disappears or expires. Exports use the monotonic screen-sharing clock and the Android document picker. A lock that ends MediaProjection finalizes the pending cue through the same stop path. The archive is available only within the Android companion.
+
 Sources: [YouTube IFrame API](https://developers.google.com/youtube/iframe_api_reference), [YouTube caption download](https://developers.google.com/youtube/v3/docs/captions/download), [YouTube terms](https://www.youtube.com/t/terms), [Android MediaProjection](https://developer.android.com/media/grow/media-projection), [Android PlaybackState](https://developer.android.com/reference/android/media/session/PlaybackState), [Even Enterprise SDK](https://hub.evenrealities.com/docs/enterprise/).

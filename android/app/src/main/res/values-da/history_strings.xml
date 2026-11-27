@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtitle_history">Underteksthistorik</string>
+    <string name="history_description">Sessionerne gemmes på telefonen. SRT-tiderne regnes fra starten af skærmdelingen.</string>
+    <string name="history_session">Session</string>
+    <string name="history_format">Format</string>
+    <string name="history_empty">Der er endnu ingen gemte undertekster.</string>
+    <string name="history_loading">Indlæser undertekster…</string>
+    <string name="history_truncated">Forhåndsvisning af en lang session. Gem filen for at få hele teksten.</string>
+    <string name="history_copy">Kopiér tekst</string>
+    <string name="history_copied">Underteksterne er kopieret.</string>
+    <string name="history_copy_failed">Teksten kunne ikke kopieres. Gem den som en fil.</string>
+    <string name="history_save">Gem fil…</string>
+    <string name="history_saved">Undertekstfilen er gemt.</string>
+    <string name="history_save_failed">Undertekstfilen kunne ikke gemmes.</string>
+    <string name="history_delete">Slet session</string>
+    <string name="history_delete_prompt">Vil du slette denne gemte session fra E2Player?</string>
+    <string name="history_error">Underteksthistorikken kunne ikke åbnes eller ændres.</string>
+    <string name="history_write_failed">Nogle undertekster kunne ikke gemmes i historikken.</string>
+</resources>

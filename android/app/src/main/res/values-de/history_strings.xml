@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtitle_history">Untertitelverlauf</string>
+    <string name="history_description">Sitzungen werden auf diesem Telefon gespeichert. SRT-Zeiten beginnen mit der Bildschirmfreigabe.</string>
+    <string name="history_session">Sitzung</string>
+    <string name="history_format">Format</string>
+    <string name="history_empty">Noch keine gespeicherten Untertitel.</string>
+    <string name="history_loading">Untertitel werden geladen…</string>
+    <string name="history_truncated">Vorschau einer langen Sitzung. Speichere die Datei für den vollständigen Text.</string>
+    <string name="history_copy">Text kopieren</string>
+    <string name="history_copied">Untertiteltext kopiert.</string>
+    <string name="history_copy_failed">Der Text konnte nicht kopiert werden. Speichere ihn als Datei.</string>
+    <string name="history_save">Datei speichern…</string>
+    <string name="history_saved">Untertiteldatei gespeichert.</string>
+    <string name="history_save_failed">Die Untertiteldatei konnte nicht gespeichert werden.</string>
+    <string name="history_delete">Sitzung löschen</string>
+    <string name="history_delete_prompt">Diese gespeicherte Sitzung aus E2Player löschen?</string>
+    <string name="history_error">Auf den Untertitelverlauf konnte nicht zugegriffen werden.</string>
+    <string name="history_write_failed">Einige Untertitel konnten nicht im Verlauf gespeichert werden.</string>
+</resources>

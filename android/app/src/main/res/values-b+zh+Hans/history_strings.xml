@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtitle_history">字幕历史</string>
+    <string name="history_description">会话保存在本机。SRT 时间从屏幕共享开始时计算。</string>
+    <string name="history_session">会话</string>
+    <string name="history_format">格式</string>
+    <string name="history_empty">暂无已保存的字幕。</string>
+    <string name="history_loading">正在加载字幕…</string>
+    <string name="history_truncated">这是较长会话的预览。请保存文件以获取完整文本。</string>
+    <string name="history_copy">复制文本</string>
+    <string name="history_copied">字幕文本已复制。</string>
+    <string name="history_copy_failed">无法复制文本。请保存为文件。</string>
+    <string name="history_save">保存文件…</string>
+    <string name="history_saved">字幕文件已保存。</string>
+    <string name="history_save_failed">无法保存字幕文件。</string>
+    <string name="history_delete">删除会话</string>
+    <string name="history_delete_prompt">从 E2Player 删除这条已保存的会话？</string>
+    <string name="history_error">无法访问字幕历史。</string>
+    <string name="history_write_failed">部分字幕无法保存到历史记录。</string>
+</resources>

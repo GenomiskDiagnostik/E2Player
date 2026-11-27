@@ -37,6 +37,7 @@ public final class ProbeActivity extends Activity {
     private Button copy;
     private TextView status;
     private TextView linkStatus;
+    private TextView historyStatus;
     private TextView caption;
     private boolean choosingSource;
 
@@ -48,6 +49,7 @@ public final class ProbeActivity extends Activity {
             stop.setEnabled(state.running());
             copy.setEnabled(CaptureService.pairingCode() != null);
             linkStatus.setVisibility(CaptureService.linkFailed() ? View.VISIBLE : View.GONE);
+            historyStatus.setVisibility(CaptureService.historyFailed() ? View.VISIBLE : View.GONE);
             status.setText(state.status());
             String text = state.sample() == null ? "" : state.sample().visibleText(SystemClock.elapsedRealtime());
             caption.setText(text.isEmpty() ? getText(R.string.no_current_text) : text);
@@ -111,6 +113,13 @@ public final class ProbeActivity extends Activity {
 
         status = new TextView(this);
         content.addView(status);
+        var history = new Button(this);
+        history.setText(R.string.subtitle_history);
+        history.setOnClickListener(view -> startActivity(new Intent(this, SubtitleHistoryActivity.class)));
+        content.addView(history);
+        historyStatus = new TextView(this);
+        historyStatus.setText(R.string.history_write_failed);
+        content.addView(historyStatus);
         caption = new TextView(this);
         caption.setTextSize(20);
         content.addView(caption);
