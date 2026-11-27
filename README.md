@@ -6,9 +6,9 @@ The project goals also include Wear-style control of the phone's active media se
 
 ## Connect on Android
 
-Install the companion APK and the `.ehpk` of the same release. Start single-app sharing in the companion, select the player and turn on captions in that player. Return to the companion, tap **Copy glasses code**, then paste it into the **Android** view in E2Player in the Even app and tap **Connect**. Return to the player. Use split screen with the Even app if Android suspends the plugin while the player is in front.
+Install the [captions APK](android/README.md#build-locally) and the E2Player `.ehpk` (0.2.0 or later). Start single-app sharing in the companion, select the player and turn on captions in that player. Return to the companion, tap **Copy glasses code**, then paste it into the **Android** view in E2Player in the Even app and tap **Connect**. Return to the player. Use split screen with the Even app if Android suspends the plugin while the player is in front.
 
-Swipe on G2 or R1 to select a bottom control, then tap it. The Android view shows captions by default. Playback controls require the optional Android notification-access grant and enable only when the active media session reports a matching action. Enable the grant from **Media control access** in the companion. Stopping Android screen sharing ends the connection and invalidates its code.
+Swipe on G2 or R1 to select a bottom control, then tap it. The Android view shows captions by default. System playback controls are available with the separate media-controls APK and its Android notification-access grant. Individual controls enable when the active session reports a matching action. Stopping Android screen sharing ends the connection and invalidates its code.
 
 Both apps follow the system language by default and provide a **Language** selector for English, Japanese, Danish, German, French, Spanish and Simplified Chinese. This changes the interface language. OCR still uses Danish and English models and shows the words recognized from the selected player. The Even Hub CLI does not accept Danish in the app listing metadata, so Danish is selectable inside E2Player.
 

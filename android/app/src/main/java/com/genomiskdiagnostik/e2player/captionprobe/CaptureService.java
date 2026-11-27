@@ -159,7 +159,7 @@ public final class CaptureService extends Service {
         var media = new PhoneMedia(this);
         try {
             bridge = new CaptionBridge(CaptionBridge.PORT, () -> bridgeSnapshot(media),
-                    (id, action) -> !closing && media.send(id, action));
+                    BuildConfig.MEDIA_CONTROLS ? (id, action) -> !closing && media.send(id, action) : null);
             pairingCode = bridge.code();
         } catch (IOException ignored) {
             linkFailed = true;
@@ -172,7 +172,7 @@ public final class CaptureService extends Service {
         String text = sample == null ? "" : sample.visibleText(SystemClock.elapsedRealtime());
         try {
             var playing = media.snapshot();
-            return new JSONObject().put("caption", PhoneMedia.limit(text, 160))
+            return new JSONObject().put("caption", CaptionSample.limit(text, 160))
                     .put("mediaAccess", media.hasAccess())
                     .put("media", playing == null ? JSONObject.NULL : playing)
                     .toString();

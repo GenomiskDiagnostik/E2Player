@@ -94,7 +94,7 @@ final class CaptionBridge implements AutoCloseable {
         String method = request[0].equals("OPTIONS") ? headers.get("access-control-request-method") : request[0];
         boolean read = "GET".equals(method) && path.equals("/v1/state");
         String[] segments = path.split("/", -1);
-        boolean control = "POST".equals(method) && segments.length == 5
+        boolean control = command != null && "POST".equals(method) && segments.length == 5
                 && segments[0].isEmpty() && segments[1].equals("v1") && segments[2].equals("command")
                 && segments[3].matches("[0-9]{1,12}")
                 && segments[4].matches("play|pause|stop|previous|next");
