@@ -12,6 +12,8 @@ Swipe on G2 or R1 to select a bottom control, then tap it. **Subtitles only** mo
 
 The Even Hub plugin remembers a verified code. When screen sharing stops, the captions clear and E2Player reconnects when you start sharing again. Select **Forget pairing** in the Even phone view to remove the remembered code. Reinstalling the Android companion or clearing its data requires a new pairing.
 
+Android companion 0.2.4 saves recognized subtitles locally. Open **Subtitle history** on the phone to select a finished session, copy its text, or save it as SRT or TXT. See the [history and export guide](android/README.md#subtitle-history-and-export).
+
 Both apps follow the system language by default and provide a **Language** selector for English, Japanese, Danish, German, French, Spanish and Simplified Chinese. This changes the interface language. OCR still uses Danish and English models and shows the words recognized from the selected player. The Even Hub CLI does not accept Danish in the app listing metadata, so Danish is selectable inside E2Player.
 
 ## Run locally

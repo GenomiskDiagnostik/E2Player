@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.pm.ServiceInfo;
+import android.database.sqlite.SQLiteException;
 import android.graphics.Bitmap;
 import android.graphics.PixelFormat;
 import android.hardware.display.DisplayManager;
@@ -30,6 +31,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class CaptureService extends Service {
     static final String CONSENT = "screenConsent";
@@ -43,6 +46,8 @@ public final class CaptureService extends Service {
     private static volatile State currentState = INACTIVE;
     private static volatile String pairingCode;
     private static volatile boolean linkFailed;
+    private static volatile boolean historyFailed;
+    private static final AtomicReference<String> activeHistory = new AtomicReference<>("");
 
     static State state() {
         return currentState;
@@ -54,6 +59,14 @@ public final class CaptureService extends Service {
 
     static boolean linkFailed() {
         return linkFailed;
+    }
+
+    static String activeHistoryId() {
+        return activeHistory.get();
+    }
+
+    static boolean historyFailed() {
+        return historyFailed;
     }
 
     private HandlerThread captureThread;
@@ -68,11 +81,15 @@ public final class CaptureService extends Service {
     private VirtualDisplay display;
     private MediaProjection projection;
     private TessBaseAPI recognizer;
+    private SubtitleHistory history;
+    private SubtitleHistory.Session historySession;
+    private SubtitleSession subtitles;
     private boolean visible;
     private long lastSampleMs = -SAMPLE_INTERVAL_MS;
     private final MediaProjection.Callback projectionCallback = new MediaProjection.Callback() {
         @Override
         public void onStop() {
+            recordSubtitle("", SystemClock.elapsedRealtime());
             stopSelf();
         }
 
@@ -80,6 +97,7 @@ public final class CaptureService extends Service {
         public void onCapturedContentResize(int width, int height) {
             if (closing || display == null || width <= 0 || height <= 0) return;
             if (width == reader.getWidth() && height == reader.getHeight()) return;
+            recordSubtitle("", SystemClock.elapsedRealtime());
             update(true, R.string.resizing, null);
             var previous = reader;
             try {
@@ -97,6 +115,7 @@ public final class CaptureService extends Service {
         @Override
         public void onCapturedContentVisibilityChanged(boolean isVisible) {
             visible = isVisible;
+            recordSubtitle("", SystemClock.elapsedRealtime());
             update(true, isVisible ? R.string.reading : R.string.hidden, null);
         }
     };
@@ -123,6 +142,7 @@ public final class CaptureService extends Service {
             startForeground(NOTIFICATION_ID, notification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION);
             started = true;
             linkFailed = false;
+            historyFailed = false;
             update(true, R.string.starting, null);
             captureThread = new HandlerThread("caption-capture");
             captureThread.start();
@@ -147,7 +167,13 @@ public final class CaptureService extends Service {
             display = projection.createVirtualDisplay("Caption Probe", bounds.width(), bounds.height(),
                     density(), DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, reader.getSurface(), null, capture);
             if (display == null) throw new IOException("Could not create the virtual display");
+            long captureStarted = SystemClock.elapsedRealtime();
+            long startedAt = System.currentTimeMillis();
             recognizer = openRecognizer();
+            history = new SubtitleHistory(this);
+            historySession = new SubtitleHistory.Session(UUID.randomUUID().toString(), startedAt);
+            subtitles = new SubtitleSession(captureStarted);
+            activeHistory.set(historySession.id());
             openBridge();
         } catch (RuntimeException | IOException | UnsatisfiedLinkError ignored) {
             update(false, R.string.start_failed, null);
@@ -236,11 +262,27 @@ public final class CaptureService extends Service {
                 crop = captionArea(frame);
             }
             recognizer.setImage(crop);
-            update(true, R.string.reading, new CaptionSample(recognizer.getUTF8Text(), now));
+            var sample = new CaptionSample(recognizer.getUTF8Text(), now);
+            if (!closing) {
+                update(true, R.string.reading, sample);
+                recordSubtitle(sample.text(), sample.capturedAtMs());
+            }
         } catch (RuntimeException ignored) {
             update(true, R.string.unreadable, null);
+            if (!closing) recordSubtitle("", SystemClock.elapsedRealtime());
         } finally {
             if (crop != null) crop.recycle();
+        }
+    }
+
+    private void recordSubtitle(String text, long nowMs) {
+        if (subtitles == null) return;
+        var cue = subtitles.observe(text, nowMs);
+        if (cue == null) return;
+        try {
+            history.append(historySession, cue);
+        } catch (SQLiteException ignored) {
+            historyFailed = true;
         }
     }
 
@@ -279,6 +321,7 @@ public final class CaptureService extends Service {
 
     @Override
     public void onDestroy() {
+        long stoppedAt = SystemClock.elapsedRealtime();
         synchronized (this) {
             closing = true;
             pairingCode = null;
@@ -294,6 +337,12 @@ public final class CaptureService extends Service {
         }
         if (capture != null) {
             capture.post(() -> {
+                if (history != null) {
+                    recordSubtitle("", stoppedAt);
+                    activeHistory.compareAndSet(historySession.id(), "");
+                    history.close();
+                    subtitles = null;
+                }
                 if (socket != null) {
                     try {
                         socket.stop(250);

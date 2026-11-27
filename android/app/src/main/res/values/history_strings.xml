@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtitle_history">Subtitle history</string>
+    <string name="history_description">Sessions are saved on this phone. SRT times start when sharing begins.</string>
+    <string name="history_session">Session</string>
+    <string name="history_format">Format</string>
+    <string name="history_empty">No saved subtitles yet.</string>
+    <string name="history_loading">Loading subtitles…</string>
+    <string name="history_truncated">Preview of a long session. Save the file for the complete text.</string>
+    <string name="history_copy">Copy text</string>
+    <string name="history_copied">Subtitle text copied.</string>
+    <string name="history_copy_failed">Could not copy the text. Save it as a file instead.</string>
+    <string name="history_save">Save file…</string>
+    <string name="history_saved">Subtitle file saved.</string>
+    <string name="history_save_failed">Could not save the subtitle file.</string>
+    <string name="history_delete">Delete session</string>
+    <string name="history_delete_prompt">Delete this saved session from E2Player?</string>
+    <string name="history_error">Could not access the subtitle history.</string>
+    <string name="history_write_failed">Some subtitles could not be saved to history.</string>
+</resources>

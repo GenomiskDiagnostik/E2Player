@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtitle_history">Historial de subtítulos</string>
+    <string name="history_description">Las sesiones se guardan en este teléfono. Los tiempos del SRT se cuentan desde el inicio de la pantalla compartida.</string>
+    <string name="history_session">Sesión</string>
+    <string name="history_format">Formato</string>
+    <string name="history_empty">Todavía no hay subtítulos guardados.</string>
+    <string name="history_loading">Cargando subtítulos…</string>
+    <string name="history_truncated">Vista previa de una sesión larga. Guarda el archivo para obtener el texto completo.</string>
+    <string name="history_copy">Copiar texto</string>
+    <string name="history_copied">Texto de los subtítulos copiado.</string>
+    <string name="history_copy_failed">No se pudo copiar el texto. Guárdalo como archivo.</string>
+    <string name="history_save">Guardar archivo…</string>
+    <string name="history_saved">Archivo de subtítulos guardado.</string>
+    <string name="history_save_failed">No se pudo guardar el archivo de subtítulos.</string>
+    <string name="history_delete">Eliminar sesión</string>
+    <string name="history_delete_prompt">¿Eliminar esta sesión guardada de E2Player?</string>
+    <string name="history_error">No se pudo acceder al historial de subtítulos.</string>
+    <string name="history_write_failed">No se pudieron guardar algunos subtítulos en el historial.</string>
+</resources>

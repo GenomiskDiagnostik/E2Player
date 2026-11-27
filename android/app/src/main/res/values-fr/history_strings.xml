@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="subtitle_history">Historique des sous-titres</string>
+    <string name="history_description">Les sessions sont enregistrées sur ce téléphone. Les temps SRT sont calculés à partir du début du partage.</string>
+    <string name="history_session">Session</string>
+    <string name="history_format">Format</string>
+    <string name="history_empty">Aucun sous-titre enregistré pour le moment.</string>
+    <string name="history_loading">Chargement des sous-titres…</string>
+    <string name="history_truncated">Aperçu d’une session longue. Enregistrez le fichier pour obtenir le texte complet.</string>
+    <string name="history_copy">Copier le texte</string>
+    <string name="history_copied">Texte des sous-titres copié.</string>
+    <string name="history_copy_failed">Impossible de copier le texte. Enregistrez-le dans un fichier.</string>
+    <string name="history_save">Enregistrer le fichier…</string>
+    <string name="history_saved">Fichier de sous-titres enregistré.</string>
+    <string name="history_save_failed">Impossible d’enregistrer le fichier de sous-titres.</string>
+    <string name="history_delete">Supprimer la session</string>
+    <string name="history_delete_prompt">Supprimer cette session enregistrée dans E2Player ?</string>
+    <string name="history_error">Impossible d’accéder à l’historique des sous-titres.</string>
+    <string name="history_write_failed">Certains sous-titres n’ont pas pu être enregistrés dans l’historique.</string>
+</resources>
