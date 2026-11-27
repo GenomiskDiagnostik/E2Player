@@ -8,12 +8,26 @@ import {
   TextContainerUpgrade,
   waitForEvenAppBridge,
 } from '@evenrealities/even_hub_sdk'
-import { Playback, commandLabels, commands, formatTime, wrapIndex } from './playback.ts'
+import { wrapIndex } from './playback.ts'
+
+export interface GlassesControl {
+  label: string
+  symbol: string
+  enabled: boolean
+  run(): void
+}
+
+export interface GlassesScreen {
+  source: 'android' | 'demo'
+  heading: string
+  caption: string
+  controls: readonly GlassesControl[]
+}
 
 const containers = [
   { containerID: 1, containerName: 'playing', yPosition: 12, height: 62, isEventCapture: 0 },
-  { containerID: 2, containerName: 'controls', yPosition: 76, height: 142, isEventCapture: 1 },
-  { containerID: 3, containerName: 'caption', yPosition: 221, height: 59, isEventCapture: 0 },
+  { containerID: 2, containerName: 'controls', yPosition: 218, height: 66, isEventCapture: 1 },
+  { containerID: 3, containerName: 'caption', yPosition: 81, height: 131, isEventCapture: 0 },
 ]
 const inputContainer = containers[1]
 const touchSources = [
@@ -22,17 +36,28 @@ const touchSources = [
   EventSourceType.TOUCH_EVENT_FROM_RING,
 ]
 
-export async function connectGlasses(playback: Playback): Promise<void> {
+export async function connectGlasses(read: () => GlassesScreen): Promise<() => void> {
   const bridge = await waitForEvenAppBridge()
-  let selected = commands.indexOf('togglePlayback')
+  let selected = -1
+  let source: GlassesScreen['source'] | undefined
+
+  function focus(screen: GlassesScreen): void {
+    if (source === screen.source && screen.controls[selected]?.enabled) return
+    source = screen.source
+    selected = screen.controls[1]?.enabled ? 1 : screen.controls.findIndex(control => control.enabled)
+  }
 
   function lines(): string[] {
-    const snapshot = playback.snapshot
-    const labels = commandLabels(snapshot)
+    const screen = read()
+    focus(screen)
+    const row = screen.controls.map((control, index) => {
+      const symbol = control.enabled ? control.symbol : '-'
+      return index === selected ? `[${symbol}]` : ` ${symbol} `
+    }).join('   ')
     return [
-      `${snapshot.track.title}\n${snapshot.status}   ${formatTime(snapshot.time)} / ${formatTime(snapshot.duration)}`,
-      commands.map((command, index) => `${index === selected ? '> ' : '  '}${labels[command]}`).join('\n'),
-      snapshot.error || snapshot.caption || ' ',
+      screen.heading,
+      `${row}\n${screen.controls[selected]?.label ?? ''}`,
+      screen.caption || ' ',
     ]
   }
 
@@ -92,22 +117,26 @@ export async function connectGlasses(playback: Playback): Promise<void> {
     }
     // Some hosts send taps as source-only system events because click maps to enum value zero.
     if (!input && (sysEvent?.eventSource === undefined || !touchSources.includes(sysEvent.eventSource))) return
+    const screen = read()
+    focus(screen)
     switch (type) {
       case OsEventTypeList.CLICK_EVENT:
       case undefined:
-        playback.run(commands[selected])
+        if (screen.controls[selected]?.enabled) screen.controls[selected].run()
         return
       case OsEventTypeList.SCROLL_TOP_EVENT:
-        selected = wrapIndex(selected - 1, commands.length)
-        break
       case OsEventTypeList.SCROLL_BOTTOM_EVENT:
-        selected = wrapIndex(selected + 1, commands.length)
+        for (let count = 0; count < screen.controls.length; count++) {
+          selected = wrapIndex(selected + (type === OsEventTypeList.SCROLL_TOP_EVENT ? -1 : 1), screen.controls.length)
+          if (screen.controls[selected].enabled) break
+        }
         break
       default:
         return
     }
     void updateDisplay()
   })
-  playback.subscribe(() => void updateDisplay())
+  void updateDisplay()
   console.info('[E2Player] Glasses page ready')
+  return () => void updateDisplay()
 }

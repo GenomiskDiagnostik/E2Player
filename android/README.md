@@ -1,6 +1,6 @@
 # Android caption probe
 
-This experimental app reads the caption area of a user-shared Android app window using Tesseract with bundled Danish and English models. It displays the latest text in the probe while the source is visible. Processing uses pixels only and requests no microphone, notification-listener, or internet permission. Frames and recognized text are kept in memory. The probe is independent of the Even Hub package and does not send text to the glasses yet.
+The companion reads the caption area of a user-shared Android app window using Tesseract with bundled Danish and English models. Frames stay in memory. The app uses Android's socket permission to serve the latest caption and optional media-session state on IPv4 loopback. It opens no listener on Wi-Fi or mobile interfaces and sends no data to remote services. [Even Hub pairing instructions](../README.md#connect-on-android).
 
 ## Build locally
 
@@ -20,6 +20,8 @@ Use Android 14 QPR2 or newer with single-app sharing. Start with owned or synthe
 2. Select **Choose app to share** and select the player under single-app sharing. Turn captions on in the player and dismiss its controls.
 3. Watch the detected text during playback, pause, seeking and cue changes. The probe looks for white text in the central 80% of the window width and 58–96% of its height. Use the default white caption color and a dark caption background where available. Empty reads and observations older than two seconds clear the text.
 4. Hide the player, rotate the phone and stop sharing. Confirm that the old caption clears and that starting again requires the system's consent.
+
+To test the Even Hub link, paste the current sharing session's code into the plugin on the same phone. Exercise captions on/off and verify that disconnecting or stopping sharing clears the text. For Android media controls, enable notification access from **Media control access**, then verify commands against the active player. Some players offer only a subset of the transport actions.
 
 The app picker can also offer full-screen sharing. Select a single app to keep other windows outside the capture. Android can withhold protected frames. Visible text inside the crop can be mistaken for a caption, and OCR can miss words and punctuation.
 

@@ -17,4 +17,11 @@
     <string name="unreadable">Waiting for a readable frame</string>
     <string name="notification_channel">Caption capture</string>
     <string name="notification_description">Reading the shared screen area locally</string>
+    <string name="language">Language</string>
+    <string name="system_language">System language</string>
+    <string name="copy_glasses_code">Copy glasses code</string>
+    <string name="code_copied">Code copied. Paste it into E2Player in Even Hub.</string>
+    <string name="link_unavailable">The local link could not start. Stop sharing and try again.</string>
+    <string name="media_access_help">For playback controls, allow E2Player notification access in Android. E2Player uses the grant to find the active player.</string>
+    <string name="media_access_settings">Media control access</string>
 </resources>

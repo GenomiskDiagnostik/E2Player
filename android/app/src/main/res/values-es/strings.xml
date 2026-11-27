@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">E2Player Subtítulos</string>
+    <string name="title">Reconocimiento de subtítulos</string>
+    <string name="instructions">Comparte solo la aplicación del reproductor. Activa sus subtítulos y oculta sus controles. Usa la pantalla dividida para ver el resultado junto a la fuente.</string>
+    <string name="choose_source">Elegir aplicación para compartir</string>
+    <string name="stop_sharing">Dejar de compartir</string>
+    <string name="no_current_text">No hay texto actual</string>
+    <string name="sharing_off">Pantalla compartida desactivada</string>
+    <string name="starting">Iniciando la pantalla compartida</string>
+    <string name="declined">Android rechazó la solicitud para compartir pantalla</string>
+    <string name="start_failed">No se pudo iniciar la captura o cargar el reconocimiento sin conexión</string>
+    <string name="resizing">Esperando el nuevo tamaño de la aplicación</string>
+    <string name="resize_failed">Android no pudo cambiar el tamaño de la aplicación compartida</string>
+    <string name="reading">Leyendo el área de subtítulos</string>
+    <string name="hidden">La aplicación compartida está oculta</string>
+    <string name="unreadable">Esperando una imagen legible</string>
+    <string name="notification_channel">Reconocimiento de subtítulos</string>
+    <string name="notification_description">Leyendo localmente el área compartida</string>
+    <string name="language">Idioma</string>
+    <string name="system_language">Idioma del sistema</string>
+    <string name="copy_glasses_code">Copiar código de las gafas</string>
+    <string name="code_copied">Código copiado. Pégalo en E2Player en Even Hub.</string>
+    <string name="link_unavailable">No se pudo iniciar la conexión local. Deja de compartir e inténtalo de nuevo.</string>
+    <string name="media_access_help">Para controlar la reproducción, permite a E2Player acceder a las notificaciones. El acceso se usa para encontrar el reproductor activo.</string>
+    <string name="media_access_settings">Acceso a controles multimedia</string>
+</resources>

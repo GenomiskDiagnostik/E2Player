@@ -8,8 +8,8 @@
 
 ## 1. Phone media sessions
 
-- [ ] Build an Android native proof of concept that discovers an active session via an explicitly enabled notification listener and invokes only transport actions advertised by that session. Check Spotify and YouTube independently, including missing Stop support and changes to the active session.
-- [ ] Test how the native component can communicate with the Even Hub WebView using supported APIs. If considering a loopback bridge, verify access in a packaged build and design per-install authentication and narrow origins before implementation. Keep metadata on-device. Test whether the plugin can be invoked from the glasses while another app plays and whether Even supports showing controls automatically.
+- [x] Discover Android's active media session via optional notification access and send only advertised transport actions via the paired loopback bridge.
+- [ ] Verify the new packaged bridge on Android with YouTube and Spotify, including missing Stop support, session changes, WebView suspension, and invocation from the glasses.
 - [ ] Check whether a supported iOS system-media integration exists. Apple's documented remote-command interface handles commands for the app playing the media. The Even Hub SDK has no documented system-media interface in the version used here.
 
 Sources: [Android MediaSessionManager](https://developer.android.com/reference/android/media/session/MediaSessionManager), [Apple remote playback events](https://developer.apple.com/documentation/mediaplayer/handling-external-player-events-notifications), [Even Hub Device APIs](https://hub.evenrealities.com/docs/build/device-apis), [Even Hub Networking](https://hub.evenrealities.com/docs/build/networking).
@@ -27,6 +27,7 @@ Sources: [YouTube IFrame Player API](https://developers.google.com/youtube/ifram
 - [x] Build an offline Android probe for visible captions via single-app capture and OCR. See [decision record](docs/adr/0001-read-rendered-captions.md) and [probe setup](android/README.md).
 - [ ] Validate the local probe on an Android phone with synthetic captions. Check capture consent, crop, timing, pause, seek, rotation, track changes, protected frames and clearing when the source is hidden or capture stops. Measure recognition accuracy and latency before adding scripts or an adjustable crop.
 - [ ] Confirm permitted YouTube use and test the selected player captions on a representative set of videos. Check subtitles off, absent tracks, auto captions and selected languages. Use the visible cue for synchronization and validate the playback-position source separately.
-- [ ] Verify how text-only observations can reach the packaged Even Hub plugin without external services. Confirm G2 display, R1 toggle, and expiry on paired hardware while the player is visible.
+- [x] Link the companion to Even Hub with a session-scoped code and an IPv4 loopback endpoint. Show paired captions by default, with a separate demo source.
+- [ ] Confirm packaged loopback access, G2 display, R1 toggle, and text expiry on paired hardware while the player is visible. Check Japanese and Chinese HUD glyph coverage on the firmware.
 
 Sources: [YouTube IFrame Player API](https://developers.google.com/youtube/iframe_api_reference), [YouTube Captions download](https://developers.google.com/youtube/v3/docs/captions/download), [Android MediaProjection](https://developer.android.com/media/grow/media-projection).

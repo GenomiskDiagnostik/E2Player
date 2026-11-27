@@ -20,20 +20,10 @@ export interface PlaybackSnapshot {
   duration: number
   captionsEnabled: boolean
   caption: string
-  error: string
+  error: '' | 'loadError' | 'playBlocked' | 'playError'
 }
 
 export const commands: readonly Command[] = ['previous', 'togglePlayback', 'stop', 'next', 'toggleCaptions']
-
-export function commandLabels(snapshot: PlaybackSnapshot): Record<Command, string> {
-  return {
-    previous: 'Previous',
-    togglePlayback: snapshot.status === 'Playing' || snapshot.status === 'Starting' ? 'Pause' : 'Play',
-    stop: 'Stop',
-    next: 'Next',
-    toggleCaptions: snapshot.captionsEnabled ? 'Captions on' : 'Captions off',
-  }
-}
 
 export function wrapIndex(index: number, count: number): number {
   return (index % count + count) % count
@@ -59,7 +49,7 @@ export class Playback {
   private starting = false
   private attempt = 0
   private captionsEnabled = false
-  private error = ''
+  private error: PlaybackSnapshot['error'] = ''
   private readonly listeners = new Set<(snapshot: PlaybackSnapshot) => void>()
 
   constructor(media: PlaybackMedia, tracks: readonly [Track, ...Track[]]) {
@@ -69,7 +59,7 @@ export class Playback {
       media.addEventListener(type, () => this.publish())
     }
     media.addEventListener('error', () => {
-      this.error = 'This media could not be loaded.'
+      this.error = 'loadError'
       this.publish()
     })
     this.loadTrack()
@@ -163,8 +153,8 @@ export class Playback {
     } catch (error) {
       if (attempt !== this.attempt) return
       this.error = error instanceof DOMException && error.name === 'NotAllowedError'
-        ? 'Tap Play on the phone to start.'
-        : 'Playback could not start.'
+        ? 'playBlocked'
+        : 'playError'
     } finally {
       if (attempt === this.attempt) {
         this.starting = false
