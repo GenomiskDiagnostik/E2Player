@@ -1,18 +1,25 @@
 # Android caption probe
 
-The companion reads the caption area of a user-shared Android app window using Tesseract with bundled Danish and English models. Frames stay in memory. The app serves the latest caption on IPv4 loopback over WebSocket on port `47842` and HTTP on port `47841`. It opens no listener on Wi-Fi or mobile interfaces and sends no data to remote services. [Even Hub pairing instructions](../README.md#connect-on-android).
+The companion reads the caption area of a user-shared Android app window using Tesseract with bundled Danish and English models. Frames stay in memory. The app serves the latest caption on IPv4 loopback over WebSocket on port `47842` and HTTP on port `47841`. It opens no listener on Wi-Fi or mobile interfaces and sends no data to remote services. [Even Hub pairing instructions](../README.md#pair-and-watch)
 
-## Build locally
+## Build and install the Android app
 
-Use JDK 17 and Android SDK Platform 36. Set `ANDROID_HOME` to the Android SDK location. The first build downloads the pinned dependencies and two checksum-verified Tesseract models.
+Clone this repository and open a terminal in its root. Use JDK 17 and Android SDK Platform 36, set `ANDROID_HOME` to the Android SDK location, and install Android SDK Platform-Tools for `adb`. The first build downloads the pinned dependencies and two checksum-verified Tesseract models.
 
 ```powershell
-.\android\gradlew.bat -p android testCaptionsDebugUnitTest lintCaptionsDebug assembleCaptionsDebug
+.\android\gradlew.bat -p android assembleCaptionsDebug
 ```
 
-On macOS and Linux, use `./android/gradlew` with the same arguments. The captions APK is `android/app/build/outputs/apk/captions/debug/app-captions-debug.apk`. It retains OCR, G2 pairing and the language picker. It omits Android notification access and the system playback commands. It uses the same application ID as version 0.2.0.
+On macOS and Linux, use `./android/gradlew` with the same arguments. The captions build includes OCR, G2 pairing and subtitle history. To build the edition that also controls the active Android media session, use `assembleMediaControlsDebug`. The two builds share one Android application ID, so installing either updates the same app.
 
-The `mediaControls` variant retains Android media-session discovery and transport. Use `testMediaControlsDebugUnitTest lintMediaControlsDebug assembleMediaControlsDebug` to verify it. The notification-listener service can trigger Google Play Protect blocks when the APK is installed from a browser, messaging app or file manager. Keep Play Protect enabled and use the captions APK for direct installation. For a suspected false positive, use Google's developer appeal process. [Google Play Protect warnings](https://support.google.com/work/android/answer/15162069?hl=en-GB).
+Enable **USB debugging** on the phone, connect it by USB, and approve the computer when Android prompts you. Run `adb devices` to verify the connection, then run one of these commands from the project root. [Android USB debugging setup](https://developer.android.com/studio/run/device)
+
+- **Captions and subtitle history** `adb install -r android/app/build/outputs/apk/captions/debug/app-captions-debug.apk`
+- **Captions and system playback controls** `adb install -r android/app/build/outputs/apk/mediaControls/debug/app-mediaControls-debug.apk`
+
+To use system playback controls, open the installed companion, tap **Media control access**, and allow E2Player in Android's notification-access settings. E2Player uses this grant to find the active media session. The notification-listener service can trigger a Play Protect block when the APK is opened from a browser, messaging app, or file manager. [Google Play Protect warnings](https://developers.google.com/android/play-protect/warning-dev-guidance#app_blocked_to_protect_your_device)
+
+For local checks, use `testCaptionsDebugUnitTest lintCaptionsDebug` for the captions build or `testMediaControlsDebugUnitTest lintMediaControlsDebug` for the media-controls build.
 
 ## Test on an Android phone
 
